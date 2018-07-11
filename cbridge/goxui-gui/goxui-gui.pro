@@ -1,7 +1,7 @@
-TARGET = goxui-gui
 TEMPLATE = lib
 
-#CONFIG += staticlib
-#win32: CONFIG += dll
+TARGET = goxui-gui
+
+DEFINES += WEB
 
 include(../src/src.pri)

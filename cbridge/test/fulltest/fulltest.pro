@@ -3,9 +3,6 @@ TEMPLATE = app
 
 SOURCES += main.c
 
-QT       += widgets qml quick concurrent core-private printsupport webengine
-
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../goxui-web/release/ -lgoxui-web
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../goxui-web/debug/ -lgoxui-web
 else:unix: LIBS += -L$$OUT_PWD/../../goxui-web/ -lgoxui-web

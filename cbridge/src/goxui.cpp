@@ -2,11 +2,11 @@
 // Created by sulin on 2017/9/23.
 //
 #ifndef QT_NO_WIDGETS
-#include <QtWidgets/QApplication>
-typedef QApplication Application;
+    #include <QtWidgets/QApplication>
+    typedef QApplication Application;
 #else
-#include <QtGui/QGuiApplication>
-typedef QGuiApplication Application;
+    #include <QtGui/QGuiApplication>
+    typedef QGuiApplication Application;
 #endif
 #include <QQmlApplicationEngine>
 #include <QQuickView>
@@ -20,9 +20,9 @@ typedef QGuiApplication Application;
 #include "core/ui_property.h"
 #include "goxui.h"
 
-#ifdef WEB
+//#ifdef WEB
 #include <QtWebEngine/qtwebengineglobal.h>
-#endif
+//#endif
 
 PropertyNode *root = nullptr;
 Application *app = nullptr;
@@ -95,8 +95,7 @@ inline QByteArray convertPtrToStr(void *arg, int type) {
             result.setNum(*reinterpret_cast< double *>(arg));
             break;
         case UI_TYPE_OBJECT:
-            result.append(QJsonDocument::fromVariant(*reinterpret_cast< QVariant *>(arg))
-                                  .toJson(QJsonDocument::Compact).data());
+            result.append(QJsonDocument::fromVariant(*reinterpret_cast< QVariant *>(arg)).toJson(QJsonDocument::Compact).data());
             break;
         default:
             result.append(*reinterpret_cast< QString *>(arg));
@@ -105,7 +104,7 @@ inline QByteArray convertPtrToStr(void *arg, int type) {
 }
 
 // 初始化函数, 必须最先调用
-void ui_init(int argc, char **argv) {
+API void ui_init(int argc, char **argv) {
     qSetMessagePattern("%{time yyyy-MM-dd hh:mm:ss} [%{type}] : %{message}");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     
@@ -117,10 +116,10 @@ void ui_init(int argc, char **argv) {
     app = new Application(argNum, argv);
     root = new PropertyNode(NULL_Str, nullptr);
     app->setQuitOnLastWindowClosed(false);
-#ifdef WEB
+//#ifdef WEB
     qDebug() << "initialize WebEngine";
     QtWebEngine::initialize();
-#endif
+//#endif
     qmlRegisterType<WindowItem>("UILib", 1, 0, "Window");
     qmlRegisterType<WindowTitleItem>("UILib", 1, 0, "TitleBar");
     qmlRegisterType<EventItem>("UILib", 1, 0, "Event");
@@ -129,7 +128,7 @@ void ui_init(int argc, char **argv) {
 }
 
 // 向QML暴露string属性
-int ui_add_field(char *name, int type, char *(*reader)(char *), void (*writer)(char *, char *)) {
+API int ui_add_field(char *name, int type, char *(*reader)(char *), void (*writer)(char *, char *)) {
     QString nameStr(name);
     Reader r = [=](void *ret) {
         char *data = reader(name);
@@ -157,7 +156,7 @@ int ui_add_field(char *name, int type, char *(*reader)(char *), void (*writer)(c
 }
 
 // 向QML暴露指定名称的函数
-int ui_add_method(char *name, int retType, int argNum, char *(*callback)(char *, char *)) {
+API int ui_add_method(char *name, int retType, int argNum, char *(*callback)(char *, char *)) {
     QString nameStr(name);
     Callback call = [=](QVariant &ret, QVariantList &args) {
         auto param = QJsonDocument::fromVariant(args).toJson(QJsonDocument::Compact).data();
@@ -169,14 +168,14 @@ int ui_add_method(char *name, int retType, int argNum, char *(*callback)(char *,
 }
 
 // 通知QML指定bool参数已更新
-int ui_notify_field(char *name) {
+API int ui_notify_field(char *name) {
     QString nameStr(name);
     QVariant var;
     return root->notifyProperty(nameStr, var);
 }
 
 // 激活QML中名称为${name}的事件
-void ui_trigger_event(char *name, int dataType, char *data) {
+API void ui_trigger_event(char *name, int dataType, char *data) {
     QString str(name);
     QVariant var;
     convertStrToVar(data, dataType, var);
@@ -189,33 +188,33 @@ void ui_trigger_event(char *name, int dataType, char *data) {
 }
 
 // 新增资源文件
-void ui_add_resource(char *prefix, char *data) {
+API void ui_add_resource(char *prefix, char *data) {
     QString rccPrefix(prefix);
     auto rccData = reinterpret_cast<uchar *>(data);
     QResource::registerResource(rccData, rccPrefix);
 }
 
 // 新增资源搜索路径
-void ui_add_resource_path(char *path) {
+API void ui_add_resource_path(char *path) {
     QString resPath(path);
     QDir::addResourceSearchPath(resPath);
 }
 
 // 新增import路径
-void ui_add_import_path(char *path) {
+API void ui_add_import_path(char *path) {
     QString importPath(path);
     engine->addImportPath(importPath);
 }
 
 // 新增资源路径
-void ui_map_resource(char *prefix, char *path) {
+API void ui_map_resource(char *prefix, char *path) {
     QString resPrefix(prefix);
     QString resPath(path);
     QDir::addSearchPath(resPrefix, resPath);
 }
 
 // 启动UI: Run模式
-int ui_start(char *qml) {
+API int ui_start(char *qml) {
     QString rootQML(qml);
     root->buildMetaData();
     engine->rootContext()->setContextObject(root);
@@ -225,7 +224,7 @@ int ui_start(char *qml) {
 }
 
 // 工具接口: 设置HTTP代理
-void ui_tool_set_http_proxy(char *host, int port) {
+API void ui_tool_set_http_proxy(char *host, int port) {
     QNetworkProxy proxy;
     proxy.setType(QNetworkProxy::HttpProxy);
     proxy.setHostName(host);

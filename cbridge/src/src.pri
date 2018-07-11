@@ -1,5 +1,7 @@
 QT       += widgets qml quick concurrent core-private printsupport
 
+DEFINES += GOXUI
+
 HEADERS += \
         $$PWD/goxui.h \
         $$PWD/core/ui_property.h \

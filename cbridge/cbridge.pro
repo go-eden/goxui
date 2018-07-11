@@ -2,11 +2,14 @@ TEMPLATE = subdirs
 
 #CONFIG += ordered
 
-SUBDIRS += \
-    goxui-gui \
-    goxui-web \
-#    test/webengine \
-    test/fulltest
+SUBDIRS += goxui-web
+#SUBDIRS += goxui-gui
+#SUBDIRS += test/fulltest
 
-test/fulltest.depends = goxui-web
+#    goxui-gui \
+#    goxui-web
+#    test/webengine \
+#    test/fulltest
+
+#test/fulltest.depends = goxui-web
 #RESOURCES += test/*

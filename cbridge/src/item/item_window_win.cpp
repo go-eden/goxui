@@ -85,6 +85,13 @@ void WindowItem::setTitleBar(WindowTitleItem *item) {
 
 // 监听事件
 bool WindowItem::event(QEvent *e) {
+    if (e->type() == QEvent::FocusIn || e->type() == QEvent::FocusOut) {
+        QRegion region(0, 0, width(), height());
+        QQuickWindow::exposeEvent(new QExposeEvent(region));
+    }
+//    if (e->type() != QEvent::MouseMove) {
+//        qDebug() << e;
+//    }
     return QQuickWindow::event(e);
 }
 
@@ -92,6 +99,7 @@ bool WindowItem::event(QEvent *e) {
 bool WindowItem::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     MSG* msg = (MSG *)message;
 
+//    qDebug() << msg->message;
     switch (msg->message) {
     case WM_NCCALCSIZE: // 窗口重绘时忽略边框、标题栏
         *result = 0;
@@ -137,8 +145,10 @@ bool WindowItem::nativeEvent(const QByteArray &eventType, void *message, long *r
         if (0 == *result && useMouseNum(title, gpos) == 1) {
             *result = HTCAPTION;
         }
-        return true;
+
+        return 0 != *result;
     }
+
     default:
         return QQuickWindow::nativeEvent(eventType, message, result);
     }
