@@ -1,7 +1,6 @@
 package main
 
 import (
-    "time"
     "runtime"
     "github.com/sisyphsu/slf4go"
     "github.com/sisyphsu/goxui"
@@ -91,16 +90,17 @@ func main() {
     
     status := &Status{}
     goxui.Init(status)
-    go func() {
-        time.Sleep(time.Second * 10)
-        goxui.TriggerEvent("event_bool", true)
-        goxui.TriggerEvent("event_int", 10000)
-        goxui.TriggerEvent("event_long", 10000000)
-        goxui.TriggerEvent("event_double", 10000.4444)
-        goxui.TriggerEvent("event_string", "fdasfadsfasdfdafdsafdsa")
-        goxui.TriggerEvent("event_object", Param{"啦啦啦", 3333333})
-        goxui.TriggerEvent("event_object", []Param{{"啦啦啦", 3333333}, {"啦啦啦444", 3333333}})
-    }()
+    //go func() {
+    //    time.Sleep(time.Second * 10)
+    //    goxui.TriggerEvent("event_bool", true)
+    //    goxui.TriggerEvent("event_int", 10000)
+    //    goxui.TriggerEvent("event_long", 10000000)
+    //    goxui.TriggerEvent("event_double", 10000.4444)
+    //    goxui.TriggerEvent("event_string", "fdasfadsfasdfdafdsafdsa")
+    //    goxui.TriggerEvent("event_object", Param{"啦啦啦", 3333333})
+    //    goxui.TriggerEvent("event_object", []Param{{"啦啦啦", 3333333}, {"啦啦啦444", 3333333}})
+    //}()
+    path = "Z:\\sulin\\workspace\\go\\src\\github.com\\sisyphsu\\goxui\\examples"
     goxui.MapResource("img", path)
-    goxui.Start(path + "/qml/main.qml")
+    goxui.Start(path + "\\qml\\simple.qml")
 }
