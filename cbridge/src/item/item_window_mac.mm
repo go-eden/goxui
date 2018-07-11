@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by sulin on 2017/9/29.
 //
 
@@ -119,7 +119,10 @@ void WindowItem::setTitleBar(WindowTitleItem *item) {
 // 监听事件
 bool WindowItem::event(QEvent *event) {
     // 释放之前缓存的MouseDown事件缓存
-    if (event->type() == QEvent::MouseButtonRelease) {
+    if(event->type() != QEvent::UpdateRequest && event->type() != QEvent::Timer && event->type() != QEvent::MouseMove) {
+        qDebug() << "event: " << event;
+    }
+    if (event->type() == QEvent::MouseButtonRelease || event->type() == QEvent::FocusOut) {
         this->macLastEvent = nullptr;
     }
     NSView *view = (NSView *)this->winId();
@@ -131,7 +134,7 @@ bool WindowItem::event(QEvent *event) {
         QWindow::exposeEvent(new QExposeEvent(region));
         oldRatio = newRatio;
     }
-    if (event->type()==QEvent::Resize) {
+    if (event->type() == QEvent::Resize) {
         adjustTitle(this, title);
     }
     if (event->type() == QEvent::WindowStateChange) {

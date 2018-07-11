@@ -1,4 +1,4 @@
-import QtQuick 2.9
+﻿import QtQuick 2.9
 import QtQuick.Controls 2.2
 import UILib 1.0
 
@@ -25,6 +25,16 @@ Window {
             height: 80
             color: "red"
             z: 1
+        }
+        TitleBar {
+            width: 100
+            height: 30
+            x:10
+            y:10
+            Rectangle{
+                anchors.fill: parent
+                color: "#72F"
+            }
         }
         onMyFlagChanged: {
             console.log("onMyFlagChanged", myFlag)
@@ -58,51 +68,51 @@ Window {
             Root.str = "hahah哈哈"
 
             console.log("===================== after")
-            console.log("Flag: ", Flag)
-            console.log("Root.number: ", Root.number)
-            console.log("Root.number2: ", Root.number2)
-            console.log("Root.body.real: ", Root.body.real)
-            console.log("Root.str: ", Root.str)
+            return;
+////            console.log("Flag: ", Flag)
+//            console.log("Root.number: ", Root.number)
+//            console.log("Root.number2: ", Root.number2)
+//            console.log("Root.body.real: ", Root.body.real)
+//            console.log("Root.str: ", Root.str)
 
-            console.log("===================== test method")
-            console.log(Test(1990, 34.9))
-            Test(2000, 44.2324, function (data) {
-                console.log("Test异步回调：", data)
-            })
-            Root.Test(undefined, "fdsfds", {
-                          test: true
-                      }, function (data) {
-                          console.log("Root.Test异步回调：", data)
-                      })
-            var result = Root.Body.Test(0.22, null, {
-                                            param: 'ff'
-                                        })
-            console.log("Root.Body.Test同步结果：", result, JSON.stringify(result))
-            Root.Body.Test(0.22, null, {
-                               param: 'ff'
-                           }, function (data) {
-                               console.log("Root.Body.Test异步回调：", data,
-                                           JSON.stringify(data))
-                           })
-            Root.Test0(null, null, function (data) {
-                console.log("Root.Test0", data)
-            })
-            Root.Test1(null, null, function (data) {
-                console.log("Root.Test1", data)
-            })
-            Root.Test2(null, null, function (data) {
-                console.log("Root.Test2", data)
-            })
-            Root.Body.Test1(0.22, null, {
-                                param: 'ff'
-                            }, function (data) {
-                                console.log("Root.Body.Test1异步回调：", data,
-                                            JSON.stringify(data))
-                            })
-            
-            console.log("Start waitFor")
-            System.waitFor("testttttttt")
-            console.log("Done waitFor")
+//            console.log("===================== test method")
+//            console.log(Test(1990, 34.9))
+//            Test(2000, 44.2324, function (data) {
+//                console.log("Test异步回调：", data)
+//            })
+//            Root.Test(undefined, "fdsfds", {
+//                          test: true
+//                      }, function (data) {
+//                          console.log("Root.Test异步回调：", data)
+//                      })
+//            var result = Root.Body.Test(0.22, null, {
+//                                            param: 'ff'
+//                                        })
+//            console.log("Root.Body.Test同步结果：", result, JSON.stringify(result))
+//            Root.Body.Test(0.22, null, {
+//                               param: 'ff'
+//                           }, function (data) {
+//                               console.log("Root.Body.Test异步回调：", data,
+//                                           JSON.stringify(data))
+//                           })
+//            Root.Test0(null, null, function (data) {
+//                console.log("Root.Test0", data)
+//            })
+//            Root.Test1(null, null, function (data) {
+//                console.log("Root.Test1", data)
+//            })
+//            Root.Test2(null, null, function (data) {
+//                console.log("Root.Test2", data)
+//            })
+//            Root.Body.Test1(0.22, null, {
+//                                param: 'ff'
+//                            }, function (data) {
+//                                console.log("Root.Body.Test1异步回调：", data,
+//                                            JSON.stringify(data))
+//                            })
+//            console.log("Start waitFor")
+////            System.waitFor("testttttttt")
+//            console.log("Done waitFor")
         }
         Event {
             key: "event_bool"

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by sulin on 2017/9/22.
 //
 //#include <printf.h>
@@ -131,5 +131,6 @@ int main(int argc, char *argv[]) {
     ui_add_method(("Root.Body.Test1"), UI_TYPE_OBJECT, 3, callback4);
 
 //    return ui_start(("/home/sulin/workspace/client-shell/test/fulltest/qml/main.qml"));
-    return ui_start(("/Users/sulin/workspace/shareit/client-shell/test/fulltest/qml/main.qml"));
+//    return ui_start(("/Users/sulin/workspace/shareit/client-shell/test/fulltest/qml/main.qml"));
+    return ui_start("Z:\\sulin\\workspace\\go\\src\\github.com\\sisyphsu\\goxui\\cbridge\\test\\fulltest\\qml\\main.qml");
 }

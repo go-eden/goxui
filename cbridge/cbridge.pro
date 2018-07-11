@@ -5,7 +5,7 @@ TEMPLATE = subdirs
 SUBDIRS += \
     goxui-gui \
     goxui-web \
-    test/webengine \
+#    test/webengine \
     test/fulltest
 
 #RESOURCES += test/*

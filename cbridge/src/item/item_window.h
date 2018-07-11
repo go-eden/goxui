@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by sulin on 2017/9/29.
 //
 
@@ -19,6 +19,8 @@ class WindowTitleItem : public QQuickItem {
 public:
     explicit WindowTitleItem(QQuickItem *parent = Q_NULLPTR);
        
+    ~WindowTitleItem();
+
     void mouseDoubleClickEvent(QMouseEvent *event);
   
     void mousePressEvent(QMouseEvent *event);
@@ -34,6 +36,7 @@ private:
     qreal oldRatio; // 当前窗口当前采用的像素密度, MAC环境需要在像素密度变化时手动刷新窗口
     WindowTitleItem *title;
     
+    int winBorderWidth; // Win平台的边框宽度
     void *macEventMonitor; // MAC平台注册的事件监听器
     void *macLastEvent; // MAC平台最近的事件
 

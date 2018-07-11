@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by sulin on 2017/9/23.
 //
 #ifndef QT_NO_WIDGETS
@@ -106,11 +106,11 @@ inline QByteArray convertPtrToStr(void *arg, int type) {
 
 // 初始化函数, 必须最先调用
 void ui_init(int argc, char **argv) {
-    qputenv("QML_DISABLE_DISK_CACHE", "1");
-    qputenv("QSG_RENDER_LOOP", "basic");
     qSetMessagePattern("%{time yyyy-MM-dd hh:mm:ss} [%{type}] : %{message}");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    // QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // windows需要
+    
+    qputenv("QSG_RENDER_LOOP", "basic"); // for Qt5.9
+    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // for windows vm
     
     static QString NULL_Str;
     static int argNum = argc;

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by sulin on 2018/1/12.
 //
 #include <QClipboard>
