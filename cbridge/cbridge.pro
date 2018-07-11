@@ -8,4 +8,5 @@ SUBDIRS += \
 #    test/webengine \
     test/fulltest
 
+test/fulltest.depends = goxui-web
 #RESOURCES += test/*

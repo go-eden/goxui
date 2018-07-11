@@ -1,11 +1,9 @@
-TARGET = goxui-web
-
 QT += webengine
 
-TEMPLATE = lib
-
-CONFIG += staticlib
-win32: CONFIG += dll
+TARGET      = goxui-web
+TEMPLATE    = lib
+#CONFIG      += staticlib
+#win32: CONFIG += dll
 
 DEFINES += WEB
 
