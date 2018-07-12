@@ -20,9 +20,9 @@
 #include "core/ui_property.h"
 #include "goxui.h"
 
-//#ifdef WEB
-#include <QtWebEngine/qtwebengineglobal.h>
-//#endif
+#ifdef WEB
+    #include <QtWebEngine/qtwebengineglobal.h>
+#endif
 
 PropertyNode *root = nullptr;
 Application *app = nullptr;
@@ -116,10 +116,10 @@ API void ui_init(int argc, char **argv) {
     app = new Application(argNum, argv);
     root = new PropertyNode(NULL_Str, nullptr);
     app->setQuitOnLastWindowClosed(false);
-//#ifdef WEB
+#ifdef WEB
     qDebug() << "initialize WebEngine";
     QtWebEngine::initialize();
-//#endif
+#endif
     qmlRegisterType<WindowItem>("UILib", 1, 0, "Window");
     qmlRegisterType<WindowTitleItem>("UILib", 1, 0, "TitleBar");
     qmlRegisterType<EventItem>("UILib", 1, 0, "Event");
@@ -131,9 +131,12 @@ API void ui_init(int argc, char **argv) {
 API int ui_add_field(char *name, int type, char *(*reader)(char *), void (*writer)(char *, char *)) {
     QString nameStr(name);
     Reader r = [=](void *ret) {
+        qDebug() << "invoke c getter of property" << name;
         char *data = reader(name);
+        qDebug() << "invoke c getter of property" << name << "done, result is:" << data;
         convertStrToPtr(data, type, ret);
-        free(data); // 主动释放此内存
+        qDebug() << "convert to ptr success";
+        // free(data); // 主动释放此内存
     };
     Writer w = [=](void *arg) {
         QByteArray tmp = convertPtrToStr(arg, type);
@@ -162,7 +165,7 @@ API int ui_add_method(char *name, int retType, int argNum, char *(*callback)(cha
         auto param = QJsonDocument::fromVariant(args).toJson(QJsonDocument::Compact).data();
         auto str = callback(name, param);
         convertStrToVar(str, retType, ret);
-        free(str); // 主动释放此内存!!!
+        // free(str); // 主动释放此内存!!!
     };
     return root->addMethod(nameStr, argNum, call);
 }

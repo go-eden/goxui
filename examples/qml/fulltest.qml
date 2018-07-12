@@ -7,25 +7,34 @@ Window {
     visible: true
     width: 560
     height: 460
-    color: "transparent"
+//    color: "transparent"
     Rectangle {
         id: main
         anchors.fill: parent
         color: "#F1F4F9"
-        property bool myFlag : Flag
-        property int myNum : Root.Number
-        property double myReal : Root.Body.Real
-        property string myStr : Root.Str
         Rectangle {
-            anchors {
-                right:parent.right
-                bottom:parent.bottom
-            }
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
             width: 80
             height: 80
             color: "red"
             z: 1
         }
+        TitleBar {
+            width: 100
+            height: 30
+            x:10
+            y:10
+            Rectangle {
+                anchors.fill: parent
+                color: "#72F"
+            }
+        }
+
+        property bool myFlag : Flag
+        property int myNum : Root.Number
+        property double myReal : Root.Body.Real
+        property string myStr : Root.Str
         onMyFlagChanged: {
             console.log("onMyFlagChanged", myFlag)
         }
@@ -54,7 +63,7 @@ Window {
             Root.Number2 = 2345654345676543456;
             Root.Body.Real = 1111.2344;
             Root.Str = "hahah哈哈";
-
+//
             console.log("===================== after");
             console.log("Flag: ", Flag);
             console.log("Root.Number: ", Root.Number);
@@ -87,7 +96,7 @@ Window {
             Root.Body.Test1(0.22, null, {param:'ff'}, function(data){
                 console.log("Root.Body.Test1异步回调：", data, JSON.stringify(data));
             });
-            Root.Test3("哈哈", {name:'你好', age: 9999});
+            Root.Test3("哈哈", {name:"你好", age: 9999});
         }
         Event {
             key: "event_bool"
@@ -127,7 +136,7 @@ Window {
         }
         Event {
             key: "event_array"
-            onActive: function(data){
+            onActive: function(data) {
                 console.log("event_array", data, JSON.stringify(data));
             }
         }

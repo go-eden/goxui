@@ -23,23 +23,31 @@ int PropertyNode::qt_metacall(QMetaObject::Call call, int v, void **args) {
     if (call == QMetaObject::ReadProperty) {
         void *ret = args[0];
         QMetaProperty prop = metaObject()->property(v);
+        qDebug() << "before read property" << prop.name() << "with type " << prop.type();
         if (subNodes.contains(prop.name())) {
+            qDebug() << "enter subnode to read property" << prop.name();
             *reinterpret_cast< PropertyNode **>(ret) = subNodes[prop.name()];
         } else if (fields.contains(prop.name())) {
+            qDebug() << "execute read property" << prop.name();
             fields[prop.name()].reader(ret);
+            qDebug() << "finish read property" << prop.name();
         } else {
-            qWarning() << "invalid ReadProperty operate: " << v;
+            qWarning() << "invalid ReadProperty operate:" << v;
         }
     } else if (call == QMetaObject::WriteProperty) {
         void *arg = args[0];
         QMetaProperty prop = metaObject()->property(v);
+        qDebug() << "before write property" << prop.name() << "with type " << prop.type();
         if (fields.contains(prop.name())) {
+            qDebug() << "execute write property" << prop.name();
             fields[prop.name()].writer(arg);
+            qDebug() << "finish write property" << prop.name();
         } else {
-            qWarning() << "invalid WriteProperty operate: " << v;
+            qWarning() << "invalid WriteProperty operate:" << v;
         }
     } else if (call == QMetaObject::InvokeMetaMethod) {
         QMetaMethod prop = metaObject()->method(v);
+        qDebug() << "before call method " << prop.name();
         if (methods.contains(prop.name())) {
             auto method = methods[prop.name()];
             QVariantList argList;
@@ -47,12 +55,17 @@ int PropertyNode::qt_metacall(QMetaObject::Call call, int v, void **args) {
                 argList.append((*static_cast<QJSValue *>(args[i])).toVariant());
             }
             if (prop.parameterCount() == method.argNum) {
+                qDebug() << "sync call method " << prop.name();
                 QVariant ret;
                 method.callback(ret, argList);
+                qDebug() << "finish call method " << prop.name();
                 *reinterpret_cast< QVariant *>(args[0]) = ret;
+                qDebug() << "return result of method " << prop.name();
             } else {
+                qDebug() << "async call method - " << prop.name();
                 auto callback = static_cast<QJSValue *>(args[method.argNum + 1]);
                 if (callback != nullptr && callback->isCallable()) {
+                    qDebug() << "async call method done - " << prop.name();
                     QtConcurrent::run(method, &Method::asyncInvoke, argList, new QJSValue(*callback));
                 } else {
                     qWarning() << "invalid InvokeMetaMethod arguments.";

@@ -7,7 +7,7 @@ Window {
     visible: true
     width: 560
     height: 460
-    color: "transparent"
+//    color: "transparent"
     Rectangle {
         id: main
         anchors.fill: parent

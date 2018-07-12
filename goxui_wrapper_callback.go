@@ -72,6 +72,7 @@ func getField(cName *C.char) *C.char {
 
 //export setField
 func setField(cName *C.char, cVal *C.char) {
+    println("$$$$setField")
     name := C.GoString(cName)
     val := C.GoString(cVal)
     if writer, ok := fieldWriterMap[name]; ok {
