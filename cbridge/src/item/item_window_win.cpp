@@ -11,15 +11,15 @@
 
 #include "item_window.h"
 
-// 计算指定控件内部占用鼠标的子控件数量
-int useMouseNum(QQuickItem *item, QPointF &gpos) {
+// 计算指定控件内部FocusScope控件数量
+int focusNum(QQuickItem *item, QPointF &gpos) {
     if (item == nullptr || !item->isEnabled() || !item->contains(item->mapFromGlobal(gpos))) {
         return 0;
     }
-    int num = item->acceptedMouseButtons() == Qt::LeftButton ? 0 : 1;
+    int num = item->acceptedMouseButtons() == Qt::LeftButton  ? 0 : 1;
     QList<QQuickItem *>	children = item->childItems();
     for (int i=0; i<children.size() && num <= 1; i++) {
-        num += useMouseNum(children[i], gpos);
+        num += focusNum(children[i], gpos);
     }
     return num;
 }
@@ -89,9 +89,6 @@ bool WindowItem::event(QEvent *e) {
         QRegion region(0, 0, width(), height());
         QQuickWindow::exposeEvent(new QExposeEvent(region));
     }
-//    if (e->type() != QEvent::MouseMove) {
-//        qDebug() << e;
-//    }
     return QQuickWindow::event(e);
 }
 
@@ -99,7 +96,6 @@ bool WindowItem::event(QEvent *e) {
 bool WindowItem::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     MSG* msg = (MSG *)message;
 
-//    qDebug() << msg->message;
     switch (msg->message) {
     case WM_NCCALCSIZE: // 窗口重绘时忽略边框、标题栏
         *result = 0;
@@ -141,9 +137,11 @@ bool WindowItem::nativeEvent(const QByteArray &eventType, void *message, long *r
         }
 
         // 判断是否是标题栏
-        QPointF gpos = QPointF(x/devicePixelRatio(), y/devicePixelRatio());
-        if (0 == *result && useMouseNum(title, gpos) == 1) {
-            *result = HTCAPTION;
+        if (0 == *result && title != nullptr) {
+            QPointF gpos = QPointF(x/devicePixelRatio(), y/devicePixelRatio());
+            if (focusNum(title, gpos) == 1) {
+                *result = HTCAPTION;
+            }
         }
 
         return 0 != *result;
