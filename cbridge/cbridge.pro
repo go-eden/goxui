@@ -5,7 +5,7 @@ CONFIG += ordered
 SUBDIRS += goxui-web
 
 #SUBDIRS += goxui-gui
-#SUBDIRS += test/fulltest
+SUBDIRS += test/fulltest
 
 #    goxui-gui \
 #    goxui-web

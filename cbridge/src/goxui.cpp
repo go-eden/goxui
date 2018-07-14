@@ -20,7 +20,7 @@
 #endif
 
 PropertyNode *root = nullptr;
-QCoreApplication *app = nullptr;
+QGuiApplication *app = nullptr;
 QQmlApplicationEngine *engine = nullptr;
 QtLocalPeer *peer = nullptr;
 
@@ -222,9 +222,14 @@ API int ui_start(char *qml) {
         return !peer->sendMessage("active", 3000);
     }
     
-    // 监听peer消息
+    // 监听active消息
     QObject::connect(peer, &QtLocalPeer::messageReceived, [=](const QString &) {
-        qDebug() << "active!!!!!!!!!!!!";
+        ui_trigger_event("app_active", UI_TYPE_VOID, nullptr);
+    });
+    QObject::connect(app, &QGuiApplication::applicationStateChanged, [=](Qt::ApplicationState state){
+        if (state == Qt::ApplicationActive) {
+            ui_trigger_event("app_active", UI_TYPE_VOID, nullptr);
+        }
     });
     
     // 启动UI

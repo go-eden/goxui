@@ -58,17 +58,17 @@ Window {
             console.log("Root.body.real: ", Root.body.real)
             console.log("Root.str: ", Root.str)
 
-            Flag = false
-            Flag = true
-            Flag = false
-            Flag = true
-            Root.number = 1024
-            Root.number2 = 2345654345676543456
-            Root.body.real = 1111.2344
-            Root.str = "hahah哈哈"
+//            Flag = false
+//            Flag = true
+//            Flag = false
+//            Flag = true
+//            Root.number = 1024
+//            Root.number2 = 2345654345676543456
+//            Root.body.real = 1111.2344
+//            Root.str = "hahah哈哈"
 
-            console.log("===================== after")
-            return;
+//            console.log("===================== after")
+//            return;
 ////            console.log("Flag: ", Flag)
 //            console.log("Root.number: ", Root.number)
 //            console.log("Root.number2: ", Root.number2)

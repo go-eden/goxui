@@ -7,7 +7,7 @@
 
 
 #include <QObject>
-#include "qhotkey/qhotkey.h"
+#include "qhotkey.h"
 
 class HotKeyItem : public QObject {
 Q_OBJECT

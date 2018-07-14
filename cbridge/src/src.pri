@@ -17,8 +17,6 @@ SOURCES += \
         $$PWD/item/item_hotkey.cpp \
         $$PWD/item/item_event.cpp
 
-include(qsingle/qsingle.pri)
-
 mac: {
     SOURCES += $$PWD/item/item_window_mac.mm
 } else:win32: {
@@ -29,18 +27,8 @@ mac: {
 
 INCLUDEPATH += $$PWD
 
-# QHotKey模块
-HEADERS += $$PWD/qhotkey/qhotkey.h
-HEADERS += $$PWD/qhotkey/qhotkey_p.h
-
-SOURCES += $$PWD/qhotkey/qhotkey.cpp
-mac: {
-    SOURCES += $$PWD/qhotkey/qhotkey_mac.cpp
-} else:win32: {
-    SOURCES += $$PWD/qhotkey/qhotkey_win.cpp
-} else:unix: {
-    SOURCES += $$PWD/qhotkey/qhotkey_x11.cpp
-}
+include(qsingle/qsingle.pri)
+include(qhotkey/qhotkey.pri)
 
 # PRC
 mac: {
