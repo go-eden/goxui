@@ -106,7 +106,7 @@ inline QByteArray convertPtrToStr(void *arg, int type) {
 // 初始化函数, 必须最先调用
 API void ui_init(int argc, char **argv) {
     qSetMessagePattern("%{time yyyy-MM-dd hh:mm:ss} [%{type}] : %{message}");
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);    
     
     qputenv("QSG_RENDER_LOOP", "basic"); // for Qt5.9
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // for windows vm
