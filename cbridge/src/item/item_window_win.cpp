@@ -76,7 +76,6 @@ WindowTitleItem::~WindowTitleItem() {
     if (WindowItem* window = dynamic_cast<WindowItem*>(this->window())) {
         window->setTitleBar(nullptr);
     }
-
 }
 
 // 响应双击, 什么也不需要做
@@ -126,17 +125,6 @@ bool WindowItem::event(QEvent *e) {
     if (e->type() == QEvent::FocusIn || e->type() == QEvent::FocusOut) {
         QRegion region(0, 0, width(), height());
         QQuickWindow::exposeEvent(new QExposeEvent(region));
-    }
-
-    if (e->type() == QEvent::Resize && this->visibility() == QWindow::Maximized) {
-        QRect rect = this->geometry();
-        if (rect.left() < 0) {
-            int diff = -1 * rect.left();
-            rect.setLeft(0);
-            rect.setTop(0);
-            rect.setRight(rect.right() - diff);
-            rect.setBottom(rect.bottom() - diff);
-        }
     }
 
     return QQuickWindow::event(e);
