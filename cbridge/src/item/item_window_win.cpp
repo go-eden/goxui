@@ -118,6 +118,7 @@ void WindowItem::startDrag() {
 // 挂载标题栏, 并根据标题栏来初始化 NSTitlebarAccessoryViewController
 void WindowItem::setTitleBar(WindowTitleItem *item) {
     this->title = item;
+    return true;
 }
 
 // 监听事件
@@ -125,6 +126,10 @@ bool WindowItem::event(QEvent *e) {
     if (e->type() == QEvent::FocusIn || e->type() == QEvent::FocusOut) {
         QRegion region(0, 0, width(), height());
         QQuickWindow::exposeEvent(new QExposeEvent(region));
+    }
+    
+    if (event->type() == QEvent::Close && this->fakeClose) {
+        this->hide();
     }
 
     return QQuickWindow::event(e);

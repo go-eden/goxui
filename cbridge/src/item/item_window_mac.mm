@@ -129,9 +129,6 @@ void WindowItem::setTitleBar(WindowTitleItem *item) {
 // 监听事件
 bool WindowItem::event(QEvent *event) {
     // 释放之前缓存的MouseDown事件缓存
-    if(event->type() != QEvent::UpdateRequest && event->type() != QEvent::Timer && event->type() != QEvent::MouseMove) {
-        qDebug() << "event: " << event;
-    }
     if (event->type() == QEvent::MouseButtonRelease || event->type() == QEvent::FocusOut) {
         this->macLastEvent = nullptr;
     }
@@ -153,6 +150,10 @@ bool WindowItem::event(QEvent *event) {
         window.titleVisibility = NSWindowTitleHidden;
         window.titlebarAppearsTransparent = true;
         adjustTitle(this, title);
+    }
+    if (event->type() == QEvent::Close && this->fakeClose) {
+        this->hide();
+        return true;
     }
     return QQuickWindow::event(event);
 }

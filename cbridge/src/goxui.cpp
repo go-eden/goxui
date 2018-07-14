@@ -1,7 +1,7 @@
 ﻿//
 // Created by sulin on 2017/9/23.
 //
-#include <QtGui/QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickView>
 #include <QQmlContext>
@@ -20,7 +20,7 @@
 #endif
 
 PropertyNode *root = nullptr;
-QGuiApplication *app = nullptr;
+QApplication *app = nullptr;
 QQmlApplicationEngine *engine = nullptr;
 QtLocalPeer *peer = nullptr;
 
@@ -110,8 +110,13 @@ API void ui_init(int argc, char **argv) {
     // start
     static QString NULL_Str;
     static int argNum = argc;
-    app = new QGuiApplication(argNum, argv);
+    app = new QApplication(argNum, argv);
     peer = new QtLocalPeer(app);
+    // check repeat
+    if (peer->isClient()) {
+        qInfo() << "start repeat...";
+        peer->sendMessage("active", 5000);
+    }
     
     // init ui
     root = new PropertyNode(NULL_Str, nullptr);
@@ -217,16 +222,11 @@ API void ui_map_resource(char *prefix, char *path) {
 
 // 启动UI: Run模式
 API int ui_start(char *qml) {
-    // 判断是否重复启动
-    if (peer->isClient()) {
-        return !peer->sendMessage("active", 3000);
-    }
-    
     // 监听active消息
     QObject::connect(peer, &QtLocalPeer::messageReceived, [=](const QString &) {
         ui_trigger_event("app_active", UI_TYPE_VOID, nullptr);
     });
-    QObject::connect(app, &QGuiApplication::applicationStateChanged, [=](Qt::ApplicationState state){
+    QObject::connect(app, &QApplication::applicationStateChanged, [=](Qt::ApplicationState state){
         if (state == Qt::ApplicationActive) {
             ui_trigger_event("app_active", UI_TYPE_VOID, nullptr);
         }

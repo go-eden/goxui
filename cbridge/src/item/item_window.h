@@ -31,7 +31,9 @@ public:
  */
 class WindowItem : public QQuickWindow {
     Q_OBJECT
-
+    
+    Q_PROPERTY(bool fakeClose READ isFakeClose WRITE setFakeClose)
+    
 private:
     qreal oldRatio; // 当前窗口当前采用的像素密度, MAC环境需要在像素密度变化时手动刷新窗口
     WindowTitleItem *title;
@@ -40,6 +42,8 @@ private:
     void *macEventMonitor; // MAC平台注册的事件监听器
     void *macLastEvent; // MAC平台最近的事件
 
+    bool fakeClose;
+    
 public:
     
     explicit WindowItem(QWindow *parent = nullptr);
@@ -69,7 +73,18 @@ public:
      * @return 是否已处理
      */
     bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-
+    
+    bool isFakeClose() { return this->fakeClose; }
+    void setFakeClose(bool fakeClose) { this->fakeClose = fakeClose; }
+    
+Q_SIGNALS:
+    
+    /**
+     * 窗口关闭消息
+     * @param close
+     */
+    void closing(QQuickCloseEvent *close);
+    
 };
 
 
