@@ -1,13 +1,7 @@
 ﻿//
 // Created by sulin on 2017/9/23.
 //
-#ifndef QT_NO_WIDGETS
-    #include <QtWidgets/QApplication>
-    typedef QApplication Application;
-#else
-    #include <QtGui/QGuiApplication>
-    typedef QGuiApplication Application;
-#endif
+#include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickView>
 #include <QQmlContext>
@@ -19,14 +13,16 @@
 #include "core/ui_api.h"
 #include "core/ui_property.h"
 #include "goxui.h"
+#include "qtlocalpeer.h"
 
 #ifdef WEB
     #include <QtWebEngine/qtwebengineglobal.h>
 #endif
 
 PropertyNode *root = nullptr;
-Application *app = nullptr;
+QCoreApplication *app = nullptr;
 QQmlApplicationEngine *engine = nullptr;
+QtLocalPeer *peer = nullptr;
 
 // 将字符串转换为指定类型的Var变量
 inline void convertStrToVar(char *data, int type, QVariant &ptr) {
@@ -111,11 +107,14 @@ API void ui_init(int argc, char **argv) {
     qputenv("QSG_RENDER_LOOP", "basic"); // for Qt5.9
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // for windows vm
     
+    // start
     static QString NULL_Str;
     static int argNum = argc;
-    app = new Application(argNum, argv);
+    app = new QGuiApplication(argNum, argv);
+    peer = new QtLocalPeer(app);
+    
+    // init ui
     root = new PropertyNode(NULL_Str, nullptr);
-    app->setQuitOnLastWindowClosed(false);
 #ifdef WEB
     qDebug() << "initialize WebEngine";
     QtWebEngine::initialize();
@@ -218,6 +217,17 @@ API void ui_map_resource(char *prefix, char *path) {
 
 // 启动UI: Run模式
 API int ui_start(char *qml) {
+    // 判断是否重复启动
+    if (peer->isClient()) {
+        return !peer->sendMessage("active", 3000);
+    }
+    
+    // 监听peer消息
+    QObject::connect(peer, &QtLocalPeer::messageReceived, [=](const QString &) {
+        qDebug() << "active!!!!!!!!!!!!";
+    });
+    
+    // 启动UI
     QString rootQML(qml);
     root->buildMetaData();
     engine->rootContext()->setContextObject(root);

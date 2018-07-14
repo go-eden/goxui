@@ -17,6 +17,8 @@ SOURCES += \
         $$PWD/item/item_hotkey.cpp \
         $$PWD/item/item_event.cpp
 
+include(qsingle/qsingle.pri)
+
 mac: {
     SOURCES += $$PWD/item/item_window_mac.mm
 } else:win32: {

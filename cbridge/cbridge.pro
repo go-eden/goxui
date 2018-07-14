@@ -1,8 +1,9 @@
 TEMPLATE = subdirs
 
-#CONFIG += ordered
+CONFIG += ordered
 
 SUBDIRS += goxui-web
+
 #SUBDIRS += goxui-gui
 #SUBDIRS += test/fulltest
 

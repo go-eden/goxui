@@ -37,6 +37,16 @@ WindowTitleItem::WindowTitleItem(QQuickItem *parent) : QQuickItem(parent) {
     });
 }
 
+// 标题栏卸载
+WindowTitleItem::~WindowTitleItem() {
+    if (this->window() == nullptr) {
+        return;
+    }
+    if (WindowItem* window = dynamic_cast<WindowItem*>(this->window())) {
+        window->setTitleBar(nullptr);
+    }
+}
+
 // 响应双击, 改变窗口大小
 void WindowTitleItem::mouseDoubleClickEvent(QMouseEvent *){
     QWindow *win = this->window();
