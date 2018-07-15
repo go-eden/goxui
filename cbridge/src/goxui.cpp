@@ -104,6 +104,7 @@ API void ui_init(int argc, char **argv) {
     qSetMessagePattern("%{time yyyy-MM-dd hh:mm:ss} [%{type}] : %{message}");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);    
     
+    qputenv("QML_DISABLE_DISK_CACHE", "1"); // disable cache
     qputenv("QSG_RENDER_LOOP", "basic"); // for Qt5.9
     QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // for windows vm
     
@@ -248,4 +249,9 @@ API void ui_tool_set_http_proxy(char *host, int port) {
     proxy.setHostName(host);
     proxy.setPort(static_cast<quint16>(port));
     QNetworkProxy::setApplicationProxy(proxy);
+}
+
+// 工具接口: 设置是否启用Debug日志
+API void ui_tool_set_debug_enabled(int enable) {
+    QLoggingCategory::defaultCategory()->setEnabled(QtMsgType::QtDebugMsg, enable!=0);
 }

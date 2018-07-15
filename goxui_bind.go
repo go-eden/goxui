@@ -15,7 +15,7 @@ func init() {
 }
 
 // 将制定对象绑定入UI层, 对象中的属性、函数均会以相同名称暴露在UI中
-func bindObject(obj interface{}) {
+func BindObject(obj interface{}) {
     var success bool
     if fields, methods, success = scanMetaData(reflect.TypeOf(obj)); !success {
         logger.InfoF("scan metadata of object[%v] failed.", obj)

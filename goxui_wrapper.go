@@ -18,7 +18,7 @@ import (
 )
 
 // 联动C接口中的ui_init, 初始化uilib并绑定root
-func Init(root interface{}) {
+func Init() {
     argv := os.Args
     argc := C.int(len(argv))
     cArgv := (*[0xfff]*C.char)(C.allocArgv(argc))
@@ -26,9 +26,6 @@ func Init(root interface{}) {
         cArgv[i] = C.CString(arg)
     }
     C.ui_init(argc, (**C.char)(unsafe.Pointer(cArgv)))
-    if root != nil {
-        bindObject(root)
-    }
 }
 
 // 封装C接口中的ui_add_resource函数. 添加资源文件, UI会将此资源作为RCC加载
@@ -65,6 +62,15 @@ func ToolSetHttpProxy(host string, port int) {
     cHost := C.CString(host)
     defer C.free(unsafe.Pointer(cHost))
     C.ui_tool_set_http_proxy(cHost, C.int(port))
+}
+
+// 封装C接口中的ui_tool_set_debug_enabled函数. 设置是否启用debug日志
+func ToolSetDebugEnabled(enable bool) {
+    if enable {
+        C.ui_tool_set_debug_enabled(C.int(1))
+    } else {
+        C.ui_tool_set_debug_enabled(C.int(0))
+    }
 }
 
 // 封装C接口中的ui_start函数. Run模式启动入口, 启动成功后将阻塞直至UI退出。

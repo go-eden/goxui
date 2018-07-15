@@ -111,6 +111,12 @@ API int ui_start(char *root);
  */
 API void ui_tool_set_http_proxy(char *host, int port);
 
+/**
+ * 工具接口：设置是否启用debug日志
+ * @param enable 是否启用Debug日志
+ */  
+API void ui_tool_set_debug_enabled(int enable);
+
 #ifdef __cplusplus
 }
 #endif
