@@ -1,6 +1,8 @@
 TARGET = fulltest
 TEMPLATE = app 
 
+QT       += widgets qml quick concurrent core-private printsupport webengine
+
 SOURCES += main.c
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../goxui-web/release/ -lgoxui-web

@@ -145,7 +145,7 @@ API int ui_add_field(char *name, int type, char *(*reader)(char *), void (*write
     };
     Writer w = [=](void *arg) {
         QByteArray tmp = convertPtrToStr(arg, type);
-        writer(name, tmp.data());
+        writer(name, tmp.toBase64().data());
     };
     switch (type) {
         case UI_TYPE_BOOL:
@@ -167,8 +167,10 @@ API int ui_add_field(char *name, int type, char *(*reader)(char *), void (*write
 API int ui_add_method(char *name, int retType, int argNum, char *(*callback)(char *, char *)) {
     QString nameStr(name);
     Callback call = [=](QVariant &ret, QVariantList &args) {
-        auto param = QJsonDocument::fromVariant(args).toJson(QJsonDocument::Compact).data();
-        auto str = callback(name, param);
+        auto param = QJsonDocument::fromVariant(args).toJson(QJsonDocument::Compact);
+        qDebug() << "invoke method" << name << "with param: " << param;
+        auto str = callback(name, param.toBase64().data());
+        qDebug() << "invoke method" << name << "finish with result: "<< str;
         convertStrToVar(str, retType, ret);
         // free(str); // 主动释放此内存!!!
     };
@@ -179,6 +181,7 @@ API int ui_add_method(char *name, int retType, int argNum, char *(*callback)(cha
 API int ui_notify_field(char *name) {
     QString nameStr(name);
     QVariant var;
+    qDebug() << "field notify: " << name;
     return root->notifyProperty(nameStr, var);
 }
 
@@ -225,11 +228,11 @@ API void ui_map_resource(char *prefix, char *path) {
 API int ui_start(char *qml) {
     // 监听active消息
     QObject::connect(peer, &QtLocalPeer::messageReceived, [=](const QString &) {
-        ui_trigger_event("app_active", UI_TYPE_VOID, nullptr);
+        ui_trigger_event(const_cast<char*>("app_active"), UI_TYPE_VOID, nullptr);
     });
     QObject::connect(app, &QApplication::applicationStateChanged, [=](Qt::ApplicationState state){
         if (state == Qt::ApplicationActive) {
-            ui_trigger_event("app_active", UI_TYPE_VOID, nullptr);
+            ui_trigger_event(const_cast<char*>("app_active"), UI_TYPE_VOID, nullptr);
         }
     });
     

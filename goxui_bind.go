@@ -18,7 +18,7 @@ func init() {
 func BindObject(obj interface{}) {
     var success bool
     if fields, methods, success = scanMetaData(reflect.TypeOf(obj)); !success {
-        logger.InfoF("scan metadata of object[%v] failed.", obj)
+        logger.WarnF("scan metadata of object[%v] failed.", obj)
         return
     }
     for _, f := range fields {

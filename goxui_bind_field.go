@@ -18,12 +18,12 @@ type field struct {
 func (f *field) getter() (v string) {
     defer func() {
         if r := recover(); r != nil {
-            logger.InfoF("get field[%v] failed, panic occured: %v", f.fullname, r)
+            logger.WarnF("get field[%v] failed, panic occured: %v", f.fullname, r)
         }
     }()
     owner := findOwner(reflect.ValueOf(root), f.fullname)
     if owner.Kind() != reflect.Struct {
-        logger.InfoF("get field[%v] failed, can't find owner Struct", f.fullname)
+        logger.WarnF("get field[%v] failed, can't find owner Struct", f.fullname)
         return
     }
     m := owner.Addr().MethodByName("Get" + f.name)
@@ -43,12 +43,12 @@ func (f *field) getter() (v string) {
 func (f *field) setter(v string) {
     defer func() {
         if r := recover(); r != nil {
-            logger.InfoF("set field[%v] with param[%v] failed, panic occured: %v", f.fullname, v, r)
+            logger.WarnF("set field[%v] with param[%v] failed, panic occured: %v", f.fullname, v, r)
         }
     }()
     owner := findOwner(reflect.ValueOf(root), f.fullname)
     for owner.Kind() != reflect.Struct {
-        logger.InfoF("set field[%v] failed, can't find owner Struct", f.fullname)
+        logger.WarnF("set field[%v] failed, can't find owner Struct", f.fullname)
         return
     }
     var tmp interface{}
@@ -61,7 +61,7 @@ func (f *field) setter(v string) {
         if arg, err := convertToValue(argType, tmp); err == nil {
             m.Call([]reflect.Value{owner.Addr(), arg})
         } else {
-            logger.InfoF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, argType, err)
+            logger.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, argType, err)
             return
         }
     } else {
@@ -69,7 +69,7 @@ func (f *field) setter(v string) {
         if result, err := convertToValue(fieldV.Type(), tmp); err == nil {
             fieldV.Set(result)
         } else {
-            logger.InfoF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, fieldV.Type(), err)
+            logger.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, fieldV.Type(), err)
         }
     }
     logger.DebugF("set field[%v] done: %v", f.fullname, v)

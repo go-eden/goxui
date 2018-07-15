@@ -18,7 +18,10 @@ static inline int _ui_add_method(char *name, int retType, int argNum) {
 }
 */
 import "C"
-import "unsafe"
+import (
+    "unsafe"
+    "encoding/base64"
+)
 
 type ui_type int
 
@@ -62,6 +65,13 @@ var (
 //export getField
 func getField(cName *C.char) *C.char {
     name := C.GoString(cName)
+    defer func() {
+        defer func() {
+            if r := recover(); r != nil {
+                logger.ErrorF("getfield[%v] failed, panic occured: %v", name, r)
+            }
+        }()
+    }()
     if reader, ok := fieldReaderMap[name]; ok {
         return C.CString(reader()) // free in c
     } else {
@@ -72,9 +82,21 @@ func getField(cName *C.char) *C.char {
 
 //export setField
 func setField(cName *C.char, cVal *C.char) {
-    println("$$$$setField")
     name := C.GoString(cName)
     val := C.GoString(cVal)
+    if bs, err := base64.StdEncoding.DecodeString(val); err == nil {
+        val = string(bs)
+    } else {
+        logger.WarnF("setField %v failed, parse data [%v] failed", name, val, err)
+        return
+    }
+    defer func() {
+        defer func() {
+            if r := recover(); r != nil {
+                logger.ErrorF("setField[%v] failed with param[%v], panic occured: %v", name, val, r)
+            }
+        }()
+    }()
     if writer, ok := fieldWriterMap[name]; ok {
         writer(val)
     } else {
@@ -86,6 +108,19 @@ func setField(cName *C.char, cVal *C.char) {
 func invoke(cName *C.char, cData *C.char) *C.char {
     name := C.GoString(cName)
     data := C.GoString(cData)
+    if bs, err := base64.StdEncoding.DecodeString(data); err == nil {
+        data = string(bs)
+    } else {
+        logger.WarnF("invoke %v failed, parse data [%v] failed", name, data, err)
+        return nil
+    }
+    defer func() {
+        defer func() {
+            if r := recover(); r != nil {
+                logger.ErrorF("invoke [%v] failed with param[%v], panic occured: %v", name, data, r)
+            }
+        }()
+    }()
     if callback, ok := methodCallbackMap[name]; ok {
         return C.CString(callback(data)) // free in c
     } else {
