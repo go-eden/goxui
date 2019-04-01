@@ -19,47 +19,55 @@
 package storage
 
 import (
-    "github.com/boltdb/bolt"
+	"github.com/boltdb/bolt"
 )
 
 var (
-    SupportDir string // 支持文件的磁盘路径
-    CacheDir   string // 缓存文件的磁盘路径
-    
-    storage *bolt.DB    // 全局KV存储表
-    bucket  = "default" // 默认Bucket
+	SupportDir string // 支持文件的磁盘路径
+	CacheDir   string // 缓存文件的磁盘路径
+
+	storage *bolt.DB    // 全局KV存储表
+	bucket  = "default" // 默认Bucket
 )
 
 // 查询KEY值
 func Get(bucket, key string) (val string, exists bool) {
-    if storage == nil {
-        panic("storage not init")
-    }
-    storage.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte(bucket))
-        if b == nil {
-            return nil
-        }
-        if data := b.Get([]byte(key)); data != nil {
-            exists = true
-            val = string(data)
-        }
-        return nil
-    })
-    return
+	if storage == nil {
+		panic("storage not init")
+	}
+	err := storage.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		if b == nil {
+			return nil
+		}
+		if data := b.Get([]byte(key)); data != nil {
+			exists = true
+			val = string(data)
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	return
 }
 
 // 设置KEY值
 func Set(bucket, key, val string) {
-    if storage == nil {
-        panic("storage not init")
-    }
-    storage.Update(func(tx *bolt.Tx) error {
-        tx.CreateBucketIfNotExists([]byte(bucket))
-        bucket := tx.Bucket([]byte(bucket))
-        if bucket == nil {
-            return nil
-        }
-        return bucket.Put([]byte(key), []byte(val))
-    })
+	if storage == nil {
+		panic("storage not init")
+	}
+	err := storage.Update(func(tx *bolt.Tx) error {
+		if _, err := tx.CreateBucketIfNotExists([]byte(bucket)); err != nil {
+			return err
+		}
+		bucket := tx.Bucket([]byte(bucket))
+		if bucket == nil {
+			return nil
+		}
+		return bucket.Put([]byte(key), []byte(val))
+	})
+	if err != nil {
+		panic(err)
+	}
 }
