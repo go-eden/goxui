@@ -27,7 +27,7 @@ mac: {
 
 INCLUDEPATH += $$PWD
 
-include(qsingle/qsingle.pri)
+# include(qsingle/qsingle.pri)
 include(qhotkey/qhotkey.pri)
 
 # PRC
