@@ -7,17 +7,18 @@ import (
 	"path/filepath"
 )
 
-// 初始化存储环境, 根据指定的厂商、应用名来创建Support、Cache目录
+// Initialize mac's storage variables.
 func Init(vendor string, appName string) (err error) {
-	// find support dir
-	var supportDir = os.Getenv("HOME") + "/Library/Application Support"
+	home := os.Getenv("HOME")
+	// confirm support dir
+	var supportDir = home + "/Library/Application Support"
 	SupportDir = filepath.Join(supportDir, vendor, appName)
 	if err = os.MkdirAll(SupportDir, 0755); err != nil {
 		return errors.New("Can't create SupportDir: " + err.Error())
 	}
 
-	// find cache dir
-	var cacheFolder = os.Getenv("HOME") + "/Library/Caches"
+	// confirm cache dir
+	var cacheFolder = home + "/Library/Caches"
 	CacheDir = filepath.Join(cacheFolder, vendor, appName)
 	if err = os.MkdirAll(CacheDir, 0755); err != nil {
 		return errors.New("Can't create CacheDir: " + err.Error())

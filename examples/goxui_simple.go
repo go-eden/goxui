@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/sisyphsu/goxui"
+	"os"
 	"path/filepath"
 	"runtime"
 )
@@ -14,6 +15,8 @@ func main() {
 
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
+
+	os.Setenv("test", "name")
 
 	goxui.Init()
 	//go func() {

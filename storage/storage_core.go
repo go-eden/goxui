@@ -23,14 +23,14 @@ import (
 )
 
 var (
-	SupportDir string // 支持文件的磁盘路径
-	CacheDir   string // 缓存文件的磁盘路径
+	SupportDir string // support file's system path
+	CacheDir   string // cache file's system path
 
-	storage *bolt.DB    // 全局KV存储表
-	bucket  = "default" // 默认Bucket
+	storage *bolt.DB    // Global key-value database
+	bucket  = "default" // default bucket's name
 )
 
-// 查询KEY值
+// fetch key's value
 func Get(bucket, key string) (val string, exists bool) {
 	if storage == nil {
 		panic("storage not init")
@@ -52,7 +52,7 @@ func Get(bucket, key string) (val string, exists bool) {
 	return
 }
 
-// 设置KEY值
+// setup key
 func Set(bucket, key, val string) {
 	if storage == nil {
 		panic("storage not init")

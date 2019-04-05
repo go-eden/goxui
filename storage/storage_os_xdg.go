@@ -11,10 +11,10 @@ import (
 
 // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
-// 初始化存储环境, 根据指定的厂商、应用名来创建Support、Cache目录
+// Initialize storage variable for linux operation.
 func Init(vendor string, appName string) (err error) {
-	var globalSettingFolder string // 设置目录
-	var cacheFolder string         // 缓存目录
+	var globalSettingFolder string
+	var cacheFolder string
 	if os.Getenv("XDG_CONFIG_HOME") != "" {
 		globalSettingFolder = os.Getenv("XDG_CONFIG_HOME")
 	} else {

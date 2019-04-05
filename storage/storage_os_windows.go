@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// 初始化存储环境, 根据指定的厂商、应用名来创建Support、Cache目录
+// Initialize storage variables for windows operation.
 func Init(vendor string, appName string) (err error) {
 	// find support dir
 	var globalSettingFolder = os.Getenv("APPDATA")
