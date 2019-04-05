@@ -42,3 +42,4 @@ cmake-build*
 # Qt
 *.pro.user
 go.sum
+build-*
