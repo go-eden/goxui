@@ -25,7 +25,7 @@ void UIApi::clearComponentCache() {
 void UIApi::print(QVariant data){
     QImage img = qvariant_cast<QImage>(data);
     QPrinter printer;
-    QPrintDialog dialog(&printer, 0);
+    QPrintDialog dialog(&printer, nullptr);
     if(dialog.exec() == QDialog::Accepted) {
         QPainter painter(&printer);
         painter.drawImage(QPoint(0,0), img);
@@ -44,7 +44,7 @@ QVariantMap UIApi::execSaveFileDialog(QString defaultName, QStringList nameFilte
     QFileDialog dialog;
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("html");
-    dialog.selectFile(defaultName); // 参数
+    dialog.selectFile(defaultName);
     dialog.setNameFilters(nameFilters);
     
     result["accept"] = dialog.exec();

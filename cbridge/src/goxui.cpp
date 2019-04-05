@@ -1,124 +1,40 @@
 ﻿//
 // Created by sulin on 2017/9/23.
 //
+
+#include <QtGlobal>
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickView>
 #include <QQmlContext>
 #include <QNetworkProxy>
 #include <QFileDialog>
+
 #include "item/item_hotkey.h"
 #include "item/item_window.h"
 #include "item/item_event.h"
 #include "core/ui_api.h"
 #include "core/ui_property.h"
-#include "goxui.h"
-#include "qtlocalpeer.h"
+#include "goxui_p.h"
 
-#ifdef WEB
-    #include <QtWebEngine/qtwebengineglobal.h>
-#endif
-
-PropertyNode *root = nullptr;
-QApplication *app = nullptr;
-QQmlApplicationEngine *engine = nullptr;
-QtLocalPeer *peer = nullptr;
-
-// 将字符串转换为指定类型的Var变量
-inline void convertStrToVar(char *data, int type, QVariant &ptr) {
-    QByteArray array(data);
-    switch (type) {
-        case UI_TYPE_VOID:
-            break;
-        case UI_TYPE_BOOL:
-            ptr.setValue(array == "0" || array.toLower() == "true");
-            break;
-        case UI_TYPE_INT:
-            ptr.setValue(array.toInt());
-            break;
-        case UI_TYPE_LONG:
-            ptr.setValue(array.toLongLong());
-            break;
-        case UI_TYPE_DOUBLE:
-            ptr.setValue(array.toDouble());
-            break;
-        case UI_TYPE_OBJECT:
-            ptr.setValue(QJsonDocument::fromJson(array).toVariant());
-            break;
-        default:
-            ptr.setValue(QString(array));
-    }
-}
-
-// 将字符串转换为指定类型的变量, 并赋值给指定指针
-inline void convertStrToPtr(char *data, int type, void *ptr) {
-    QByteArray array(data);
-    switch (type) {
-        case UI_TYPE_BOOL:
-            *reinterpret_cast< bool *>(ptr) = array == "0" || array.toLower() == "true";
-            break;
-        case UI_TYPE_INT:
-            *reinterpret_cast< qint32 *>(ptr) = array.toInt();
-            break;
-        case UI_TYPE_LONG:
-            *reinterpret_cast< qint64 *>(ptr) = array.toLongLong();
-            break;
-        case UI_TYPE_DOUBLE:
-            *reinterpret_cast< double *>(ptr) = array.toDouble();
-            break;
-        case UI_TYPE_OBJECT:
-            *reinterpret_cast< QVariant *>(ptr) = QJsonDocument::fromJson(array).toVariant();
-            break;
-        default:
-            *reinterpret_cast< QString *>(ptr) = QString(data);
-    }
-}
-
-// 将指针按照指定类型格式化为字符串
-inline QByteArray convertPtrToStr(void *arg, int type) {
-    QByteArray result;
-    switch (type) {
-        case UI_TYPE_BOOL:
-            result.setNum(*reinterpret_cast< bool *>(arg));
-            break;
-        case UI_TYPE_INT:
-            result.setNum(*reinterpret_cast< qint32 *>(arg));
-            break;
-        case UI_TYPE_LONG:
-            result.setNum(*reinterpret_cast< qint64 *>(arg));
-            break;
-        case UI_TYPE_DOUBLE:
-            result.setNum(*reinterpret_cast< double *>(arg));
-            break;
-        case UI_TYPE_OBJECT:
-            result.append(QJsonDocument::fromVariant(*reinterpret_cast< QVariant *>(arg)).toJson(QJsonDocument::Compact).data());
-            break;
-        default:
-            result.append(*reinterpret_cast< QString *>(arg));
-    }
-    return result;
-}
-
-// 初始化函数, 必须最先调用
+// init QT context
 API void ui_init(int argc, char **argv) {
     qSetMessagePattern("%{time yyyy-MM-dd hh:mm:ss} [%{type}] : %{message}");
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);    
-    
-    qputenv("QML_DISABLE_DISK_CACHE", "1"); // disable cache
-    qputenv("QSG_RENDER_LOOP", "basic"); // for Qt5.9
-    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // for windows vm
-    
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    // qputenv("QML_DISABLE_DISK_CACHE", "1"); // disable cache
+    // qputenv("QSG_RENDER_LOOP", "basic"); // for Qt5.9
+    // QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // for windows vm
+
     // start
     static QString NULL_Str;
     static int argNum = argc;
-    app = new QApplication(argNum, argv);
-    peer = new QtLocalPeer(app);
-    // check repeat
-    if (peer->isClient()) {
-        qInfo() << "start repeat...";
-        peer->sendMessage("active", 5000);
+    app = new SingleApplication(argNum, argv);
+    if(app->isSecondary() ) {
+        qDebug() << "app repeated";
+        app->exit(0);
     }
-    
+
     // init ui
     root = new PropertyNode(NULL_Str, nullptr);
 #ifdef WEB
@@ -227,7 +143,7 @@ API void ui_map_resource(char *prefix, char *path) {
 // 启动UI: Run模式
 API int ui_start(char *qml) {
     // 监听active消息
-    QObject::connect(peer, &QtLocalPeer::messageReceived, [=](const QString &) {
+    QObject::connect(app, &SingleApplication::instanceStarted, [=]() {
         ui_trigger_event(const_cast<char*>("app_active"), UI_TYPE_VOID, nullptr);
     });
     QObject::connect(app, &QApplication::applicationStateChanged, [=](Qt::ApplicationState state){

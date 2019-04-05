@@ -48,7 +48,7 @@ public:
     
     explicit WindowItem(QWindow *parent = nullptr);
 
-    ~WindowItem();
+    ~WindowItem() override;
     
     /**
      * 开始窗口拖拽, 无需指定Event, 内部直接采用最近的NativeEvent.

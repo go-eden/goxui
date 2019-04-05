@@ -4,6 +4,7 @@ DEFINES += GOXUI
 
 HEADERS += \
         $$PWD/goxui.h \
+        $$PWD/goxui_p.h \
         $$PWD/core/ui_property.h \
         $$PWD/core/ui_api.h \
         $$PWD/item/item_hotkey.h \
@@ -34,7 +35,7 @@ include(../qhotkey/qhotkey.pri)
 include(../singleapplication/singleapplication.pri)
 DEFINES += QAPPLICATION_CLASS=QApplication
 
-# PRC
+# dependency os library
 mac: {
     LIBS += -framework Carbon
     LIBS += -framework Cocoa
@@ -45,7 +46,7 @@ mac: {
     LIBS += -lX11
 }
 
-# export
+# export shared library
 header_files.files = $$PWD/goxui.h
 unix {
     header_files.path = /usr/local/include
