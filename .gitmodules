@@ -1,0 +1,3 @@
+[submodule "cbridge/src/singleapplication"]
+	path = cbridge/src/singleapplication
+	url = git@github.com:itay-grudev/SingleApplication.git

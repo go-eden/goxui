@@ -27,8 +27,10 @@ mac: {
 
 INCLUDEPATH += $$PWD
 
-# include(qsingle/qsingle.pri)
 include(qhotkey/qhotkey.pri)
+
+include(singleapplication/singleapplication.pri)
+DEFINES += QAPPLICATION_CLASS=QApplication
 
 # PRC
 mac: {
