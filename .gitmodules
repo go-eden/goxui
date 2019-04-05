@@ -1,3 +1,6 @@
-[submodule "cbridge/src/singleapplication"]
-	path = cbridge/src/singleapplication
+[submodule "cbridge/qhotkey"]
+	path = cbridge/qhotkey
+	url = git@github.com:Skycoder42/QHotkey.git
+[submodule "cbridge/singleapplication"]
+	path = cbridge/singleapplication
 	url = git@github.com:itay-grudev/SingleApplication.git

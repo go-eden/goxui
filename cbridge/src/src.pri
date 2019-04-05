@@ -27,9 +27,11 @@ mac: {
 
 INCLUDEPATH += $$PWD
 
-include(qhotkey/qhotkey.pri)
+# dependency qhotkey
+include(../qhotkey/qhotkey.pri)
 
-include(singleapplication/singleapplication.pri)
+# dependency singleapplication
+include(../singleapplication/singleapplication.pri)
 DEFINES += QAPPLICATION_CLASS=QApplication
 
 # PRC
@@ -39,11 +41,11 @@ mac: {
 } else:win32: {
     LIBS += -luser32
 } else:unix {
-	QT += x11extras
-	LIBS += -lX11
+    QT += x11extras
+    LIBS += -lX11
 }
 
-# 导出接口
+# export
 header_files.files = $$PWD/goxui.h
 unix {
     header_files.path = /usr/local/include
