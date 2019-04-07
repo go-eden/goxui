@@ -2,16 +2,17 @@ package goxui
 
 import (
 	"encoding/json"
+	"github.com/sisyphsu/goxui/core"
 	"github.com/sisyphsu/goxui/util"
 	"reflect"
 )
 
 // 函数元数据
 type method struct {
-	name     string  // 函数名称
-	fullname string  // 函数全名
-	otype    ui_type // 函数出参类型
-	inum     int     // 函数入参数量
+	name     string      // 函数名称
+	fullname string      // 函数全名
+	otype    core.Q_TYPE // 函数出参类型
+	inum     int         // 函数入参数量
 }
 
 // 函数注入，封装（参数反序列化、结果序列化）
@@ -21,7 +22,7 @@ func (m *method) invoke(param string) (result string) {
 			logger.WarnF("invoke [%v] failed, panic occured: %v", m.fullname, r)
 		}
 	}()
-	owner := findOwner(reflect.ValueOf(root), m.fullname)
+	owner := util.FindOwner(reflect.ValueOf(root), m.fullname)
 	if owner.Kind() != reflect.Struct {
 		logger.WarnF("invoke [%v] failed, can't find owner Struct", m.fullname)
 		return
@@ -44,7 +45,7 @@ func (m *method) invoke(param string) (result string) {
 	for i := 0; i < methodV.Type().NumIn(); i++ {
 		argType := methodV.Type().In(i)
 		arg := args[i]
-		if argVal, err := convertToValue(argType, arg); err != nil {
+		if argVal, err := util.ConvertToValue(argType, arg); err != nil {
 			logger.WarnF("invoke [%v] failed, can't resolve argument[%v] as [%v]: %v", m.fullname, arg, argType, err)
 			return
 		} else {

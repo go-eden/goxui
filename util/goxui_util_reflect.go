@@ -1,15 +1,14 @@
-package goxui
+package util
 
 import (
 	"encoding/json"
 	"errors"
-	"github.com/sisyphsu/goxui/util"
 	"reflect"
 	"strings"
 )
 
 // 寻找指定对象所属的指针类型, 如果数据类型不是struct则返回失败
-func findStructPtrType(t reflect.Type) (reflect.Type, bool) {
+func FindStructPtrType(t reflect.Type) (reflect.Type, bool) {
 	if t.Kind() == reflect.Struct {
 		t = reflect.PtrTo(t)
 	}
@@ -19,24 +18,8 @@ func findStructPtrType(t reflect.Type) (reflect.Type, bool) {
 	return t, t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Struct
 }
 
-// 解析数据类型
-func parseType(t reflect.Type) ui_type {
-	kind := t.Kind()
-	if kind >= reflect.Int && kind <= reflect.Uintptr {
-		return UI_TYPE_LONG
-	} else if kind >= reflect.Float32 && kind <= reflect.Float64 {
-		return UI_TYPE_DOUBLE
-	} else if kind == reflect.Bool {
-		return UI_TYPE_BOOL
-	} else if kind == reflect.Array || kind == reflect.Slice || kind == reflect.Struct {
-		return UI_TYPE_OBJECT
-	} else {
-		return UI_TYPE_STRING
-	}
-}
-
 // 将string转换为指定类型的value
-func convertToValue(t reflect.Type, val interface{}) (result reflect.Value, err error) {
+func ConvertToValue(t reflect.Type, val interface{}) (result reflect.Value, err error) {
 	if val == nil {
 		result = reflect.Zero(t)
 		return
@@ -89,7 +72,7 @@ func convertToValue(t reflect.Type, val interface{}) (result reflect.Value, err 
 			tmpSlice := reflect.New(reflect.SliceOf(t.Elem()))
 			for _, item := range tmp {
 				var tmpValue reflect.Value
-				tmpValue, err = convertToValue(t.Elem(), item)
+				tmpValue, err = ConvertToValue(t.Elem(), item)
 				if err != nil {
 					return
 				}
@@ -110,9 +93,9 @@ func convertToValue(t reflect.Type, val interface{}) (result reflect.Value, err 
 			valType := t.Elem()
 			var _key, _val reflect.Value
 			for k, v := range tmp {
-				if _key, err = convertToValue(keyType, k); err != nil {
+				if _key, err = ConvertToValue(keyType, k); err != nil {
 					return
-				} else if _val, err = convertToValue(valType, v); err != nil {
+				} else if _val, err = ConvertToValue(valType, v); err != nil {
 					return
 				} else {
 					result.SetMapIndex(_key, _val)
@@ -120,10 +103,10 @@ func convertToValue(t reflect.Type, val interface{}) (result reflect.Value, err 
 			}
 		}
 	} else if t.Kind() == reflect.String {
-		result = reflect.ValueOf(util.ToString(val))
+		result = reflect.ValueOf(ToString(val))
 	} else if t.Kind() == reflect.Struct {
 		tmp := reflect.New(t)
-		if err = json.Unmarshal([]byte(util.ToJSON(val)), tmp.Interface()); err == nil {
+		if err = json.Unmarshal([]byte(ToJSON(val)), tmp.Interface()); err == nil {
 			result = tmp.Elem()
 		}
 	} else if t.Kind() == reflect.Interface {
@@ -135,7 +118,7 @@ func convertToValue(t reflect.Type, val interface{}) (result reflect.Value, err 
 }
 
 // 根据属性名称，寻找定位owner节点, 返回Struct
-func findOwner(val reflect.Value, name string) (result reflect.Value) {
+func FindOwner(val reflect.Value, name string) (result reflect.Value) {
 	if !val.IsValid() {
 		return // 无效
 	}
@@ -152,5 +135,5 @@ func findOwner(val reflect.Value, name string) (result reflect.Value) {
 	leftName := name[:offset]
 	rightName := name[offset+1:]
 	subVal := val.FieldByName(leftName)
-	return findOwner(subVal, rightName)
+	return FindOwner(subVal, rightName)
 }

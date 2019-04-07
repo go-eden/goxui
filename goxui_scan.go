@@ -1,6 +1,8 @@
 package goxui
 
 import (
+	"github.com/sisyphsu/goxui/core"
+	"github.com/sisyphsu/goxui/util"
 	"github.com/sisyphsu/slf4go"
 	"reflect"
 )
@@ -10,33 +12,9 @@ var root interface{}
 var fields []field
 var methods []method
 
-func init() {
-	logger.SetLevel(slf4go.LEVEL_WARN)
-}
-
-// 将制定对象绑定入UI层, 对象中的属性、函数均会以相同名称暴露在UI中
-func BindObject(obj interface{}) {
-	var success bool
-	if fields, methods, success = scanMetaData(reflect.TypeOf(obj)); !success {
-		logger.WarnF("scan metadata of object[%v] failed.", obj)
-		return
-	}
-	for _, f := range fields {
-		tmp := f
-		addField(tmp.fullname, tmp.ftype, tmp.getter, tmp.setter)
-		logger.InfoF("bind field: [%v], [%v]", tmp.fullname, tmp.ftype)
-	}
-	for _, m := range methods {
-		tmp := m
-		addMethod(tmp.fullname, tmp.otype, tmp.inum, tmp.invoke)
-		logger.InfoF("bind method: %v(%v), %v", tmp.fullname, tmp.inum, tmp.otype)
-	}
-	root = obj
-}
-
 // 扫描指定对象, 返回属性和函数
 func scanMetaData(otype reflect.Type) (fields []field, methods []method, success bool) {
-	if otype, success = findStructPtrType(otype); !success {
+	if otype, success = util.FindStructPtrType(otype); !success {
 		return
 	}
 	for i := 0; i < otype.NumMethod(); i++ {
@@ -46,11 +24,11 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 		item.fullname = mtype.Name
 		item.inum = mtype.Type.NumIn() - 1
 		if mtype.Type.NumOut() == 0 {
-			item.otype = UI_TYPE_VOID
+			item.otype = core.Q_TYPE_VOID
 		} else if mtype.Type.NumOut() > 1 {
-			item.otype = UI_TYPE_OBJECT
+			item.otype = core.Q_TYPE_OBJECT
 		} else {
-			item.otype = parseType(mtype.Type.Out(0))
+			item.otype = core.ParseQType(mtype.Type.Out(0))
 		}
 		methods = append(methods, item)
 	}
@@ -85,7 +63,7 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 			item := field{}
 			item.name = ftype.Name
 			item.fullname = ftype.Name
-			item.ftype = parseType(ftype.Type)
+			item.ftype = core.ParseQType(ftype.Type)
 			fields = append(fields, item)
 		}
 	}
