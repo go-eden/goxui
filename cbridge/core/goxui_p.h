@@ -5,23 +5,17 @@
 #include <QJsonDocument>
 #include <QQmlApplicationEngine>
 
-// use WebEngine optionally
-#ifdef WEB
-    #include <QtWebEngine/qtwebengineglobal.h>
-#endif
-
-// use SingleApplication
-#ifndef QAPPLICATION_CLASS
-  #define QAPPLICATION_CLASS QApplication
-#endif
-#include "singleapplication.h"
-
+#include "item/item_hotkey.h"
+#include "item/item_window.h"
+#include "item/item_event.h"
+#include "core/ui_system.h"
 #include "core/ui_property.h"
+
 #include "goxui.h"
 
-static PropertyNode *root = nullptr;
-static SingleApplication *app = nullptr;
-static QQmlApplicationEngine *engine = nullptr;
+// import SingleApplication
+#define QAPPLICATION_CLASS QApplication
+#include "singleapplication.h"
 
 // convert string data to specified type
 inline void convertStrToVar(char *data, int type, QVariant &ptr) {

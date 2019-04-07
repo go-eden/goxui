@@ -3,7 +3,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS += core
-#SUBDIRS += goxui-web
+SUBDIRS += ext
 
 #SUBDIRS += test/fulltest
 #SUBDIRS += test/webengine

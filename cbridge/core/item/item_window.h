@@ -11,7 +11,7 @@
 #include <QQuickWindow>
 
 /**
- * @brief 窗口标题栏控件, 会被用于原生拖拽等
+ * @brief For native drag
  */
 class WindowTitleItem : public QQuickItem {
     Q_OBJECT

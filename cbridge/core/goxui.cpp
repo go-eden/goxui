@@ -9,13 +9,12 @@
 #include <QQmlContext>
 #include <QNetworkProxy>
 #include <QFileDialog>
-
-#include "item/item_hotkey.h"
-#include "item/item_window.h"
-#include "item/item_event.h"
-#include "core/ui_api.h"
-#include "core/ui_property.h"
 #include "goxui_p.h"
+
+static PropertyNode *root = nullptr;
+static SingleApplication *app = nullptr;
+static QQmlApplicationEngine *engine = nullptr;
+static QMap<QString, QObject*> contextProperties;
 
 // init QT context
 API void ui_init(int argc, char **argv) {
@@ -26,7 +25,6 @@ API void ui_init(int argc, char **argv) {
     // qputenv("QSG_RENDER_LOOP", "basic"); // for Qt5.9
     // QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software); // for windows vm
 
-    // start
     static QString NULL_Str;
     static int argNum = argc;
     app = new SingleApplication(argNum, argv);
@@ -37,18 +35,22 @@ API void ui_init(int argc, char **argv) {
 
     // init ui
     root = new PropertyNode(NULL_Str, nullptr);
-#ifdef WEB
-    qDebug() << "initialize WebEngine";
-    QtWebEngine::initialize();
-#endif
-    qmlRegisterType<WindowItem>("UILib", 1, 0, "Window");
-    qmlRegisterType<WindowTitleItem>("UILib", 1, 0, "TitleBar");
-    qmlRegisterType<EventItem>("UILib", 1, 0, "Event");
-    qmlRegisterType<HotKeyItem>("UILib", 1, 0, "HotKey");
+    qmlRegisterType<WindowItem>("Goxui", 1, 0, "Window");
+    qmlRegisterType<WindowTitleItem>("Goxui", 1, 0, "TitleBar");
+    qmlRegisterType<EventItem>("Goxui", 1, 0, "Event");
+    qmlRegisterType<HotKeyItem>("Goxui", 1, 0, "HotKey");
+
     engine = new QQmlApplicationEngine();
 }
 
-// 向QML暴露string属性
+// Add an QObject into QML's context
+API void ui_add_object(char *name, void *ptr) {
+    QString nameStr(name);
+    QObject *obj = static_cast<QObject *>(ptr);
+    contextProperties.insert(nameStr, obj);
+}
+
+//  Add specified c field into QML
 API int ui_add_field(char *name, int type, char *(*reader)(char *), void (*writer)(char *, char *)) {
     QString nameStr(name);
     Reader r = [=](void *ret) {
@@ -57,7 +59,7 @@ API int ui_add_field(char *name, int type, char *(*reader)(char *), void (*write
         qDebug() << "invoke c getter of property" << name << "done, result is:" << data;
         convertStrToPtr(data, type, ret);
         qDebug() << "convert to ptr success";
-        // free(data); // 主动释放此内存
+        // free(data); // memory leak???
     };
     Writer w = [=](void *arg) {
         QByteArray tmp = convertPtrToStr(arg, type);
@@ -79,7 +81,7 @@ API int ui_add_field(char *name, int type, char *(*reader)(char *), void (*write
     }
 }
 
-// 向QML暴露指定名称的函数
+// Add specified c method into QML
 API int ui_add_method(char *name, int retType, int argNum, char *(*callback)(char *, char *)) {
     QString nameStr(name);
     Callback call = [=](QVariant &ret, QVariantList &args) {
@@ -88,12 +90,12 @@ API int ui_add_method(char *name, int retType, int argNum, char *(*callback)(cha
         auto str = callback(name, param.toBase64().data());
         qDebug() << "invoke method" << name << "finish with result: "<< str;
         convertStrToVar(str, retType, ret);
-        // free(str); // 主动释放此内存!!!
+        // free(str); // memory leak???
     };
     return root->addMethod(nameStr, argNum, call);
 }
 
-// 通知QML指定bool参数已更新
+// Notify QML that specified data has changed
 API int ui_notify_field(char *name) {
     QString nameStr(name);
     QVariant var;
@@ -101,7 +103,7 @@ API int ui_notify_field(char *name) {
     return root->notifyProperty(nameStr, var);
 }
 
-// 激活QML中名称为${name}的事件
+// Trige specified QML event by name
 API void ui_trigger_event(char *name, int dataType, char *data) {
     QString str(name);
     QVariant var;
@@ -114,35 +116,36 @@ API void ui_trigger_event(char *name, int dataType, char *data) {
     }
 }
 
-// 新增资源文件
+// Add RCC data to QResource as specified prefix
 API void ui_add_resource(char *prefix, char *data) {
     QString rccPrefix(prefix);
     auto rccData = reinterpret_cast<uchar *>(data);
     QResource::registerResource(rccData, rccPrefix);
 }
 
-// 新增资源搜索路径
+// Add file system path to QDir's resource search path
 API void ui_add_resource_path(char *path) {
     QString resPath(path);
     QDir::addResourceSearchPath(resPath);
 }
 
-// 新增import路径
+// Add file system path to QML import
 API void ui_add_import_path(char *path) {
     QString importPath(path);
     engine->addImportPath(importPath);
 }
 
-// 新增资源路径
+// Map file system resource to specify QML prefix
 API void ui_map_resource(char *prefix, char *path) {
     QString resPrefix(prefix);
     QString resPath(path);
     QDir::addSearchPath(resPrefix, resPath);
 }
 
-// 启动UI: Run模式
+// start Application
 API int ui_start(char *qml) {
     // 监听active消息
+    qDebug() << (app == nullptr);
     QObject::connect(app, &SingleApplication::instanceStarted, [=]() {
         ui_trigger_event(const_cast<char*>("app_active"), UI_TYPE_VOID, nullptr);
     });
@@ -151,17 +154,25 @@ API int ui_start(char *qml) {
             ui_trigger_event(const_cast<char*>("app_active"), UI_TYPE_VOID, nullptr);
         }
     });
-    
-    // 启动UI
-    QString rootQML(qml);
+
+    // setup root object
     root->buildMetaData();
     engine->rootContext()->setContextObject(root);
-    engine->rootContext()->setContextProperty("System", new UIApi(engine));
+
+    // setup context properties
+    contextProperties.insert("System", new UISystem(engine));
+    for(auto name : contextProperties.keys()) {
+        engine->rootContext()->setContextProperty(name, contextProperties.value(name));
+    }
+
+    // start~
+    QString rootQML(qml);
     engine->load(rootQML);
+
     return app->exec();
 }
 
-// 工具接口: 设置HTTP代理
+// TOOL: setup the http proxy of Application
 API void ui_tool_set_http_proxy(char *host, int port) {
     QNetworkProxy proxy;
     proxy.setType(QNetworkProxy::HttpProxy);
@@ -170,7 +181,7 @@ API void ui_tool_set_http_proxy(char *host, int port) {
     QNetworkProxy::setApplicationProxy(proxy);
 }
 
-// 工具接口: 设置是否启用Debug日志
+// TOOL: setup debug level's enable status
 API void ui_tool_set_debug_enabled(int enable) {
     QLoggingCategory::defaultCategory()->setEnabled(QtMsgType::QtDebugMsg, enable!=0);
 }

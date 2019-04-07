@@ -9,7 +9,7 @@ HEADERS += \
         $$PWD/goxui.h \
         $$PWD/goxui_p.h \
         $$PWD/core/ui_property.h \
-        $$PWD/core/ui_api.h \
+        $$PWD/core/ui_system.h \
         $$PWD/item/item_hotkey.h \
         $$PWD/item/item_window.h \
         $$PWD/item/item_event.h
@@ -17,7 +17,7 @@ HEADERS += \
 SOURCES += \
         $$PWD/goxui.cpp \
         $$PWD/core/ui_property.cpp \
-        $$PWD/core/ui_api.cpp \
+        $$PWD/core/ui_system.cpp \
         $$PWD/item/item_hotkey.cpp \
         $$PWD/item/item_event.cpp
 
@@ -36,7 +36,6 @@ include(../lib/qhotkey/qhotkey.pri)
 
 # dependency singleapplication
 include(../lib/singleapplication/singleapplication.pri)
-DEFINES += QAPPLICATION_CLASS=QApplication
 
 # dependency os library
 mac: {

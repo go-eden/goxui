@@ -2,8 +2,8 @@
 // Created by sulin on 2017/9/23.
 //
 
-#ifndef UILIB_UILIB_H
-#define UILIB_UILIB_H
+#ifndef GOXUI_H
+#define GOXUI_H
 
 #ifdef GOXUI
     #define API Q_DECL_EXPORT
@@ -29,6 +29,14 @@ extern "C" {  // only need to export C interface if used by C++ source code
  * @param argv 启动参数V
  */
 API void ui_init(int argc, char **argv);
+
+/**
+ * Add specified object into QML's context, MUST BE QObject
+ *
+ * @param name The name of QML's context property
+ * @param ptr The reference
+ */
+API void ui_add_object(char *name, void *ptr);
 
 /**
  * 向UI中新增一个变量, 此变量支持属性绑定
@@ -121,4 +129,4 @@ API void ui_tool_set_debug_enabled(int enable);
 }
 #endif
 
-#endif //UILIB_UILIB_H
+#endif //GOXUI_H
