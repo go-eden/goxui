@@ -1,4 +1,4 @@
-QT       += widgets qml quick concurrent core-private printsupport
+QT       += widgets qml quick concurrent core-private
 
 DEFINES += GOXUI
 
