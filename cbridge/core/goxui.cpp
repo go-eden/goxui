@@ -9,6 +9,7 @@
 #include <QQmlContext>
 #include <QNetworkProxy>
 #include <QFileDialog>
+#include "singleapplication.h"
 #include "goxui_p.h"
 
 static PropertyNode *root = nullptr;
@@ -144,8 +145,6 @@ API void ui_map_resource(char *prefix, char *path) {
 
 // start Application
 API int ui_start(char *qml) {
-    // 监听active消息
-    qDebug() << (app == nullptr);
     QObject::connect(app, &SingleApplication::instanceStarted, [=]() {
         ui_trigger_event(const_cast<char*>("app_active"), UI_TYPE_VOID, nullptr);
     });

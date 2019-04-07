@@ -10,12 +10,7 @@
 #include "item/item_event.h"
 #include "core/ui_system.h"
 #include "core/ui_property.h"
-
 #include "goxui.h"
-
-// import SingleApplication
-#define QAPPLICATION_CLASS QApplication
-#include "singleapplication.h"
 
 // convert string data to specified type
 inline void convertStrToVar(char *data, int type, QVariant &ptr) {

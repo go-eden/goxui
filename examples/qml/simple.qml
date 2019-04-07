@@ -1,6 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
-import UILib 1.0
+import Goxui 1.0
 
 Window {
     id: mainWindow

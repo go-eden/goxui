@@ -36,6 +36,7 @@ include(../lib/qhotkey/qhotkey.pri)
 
 # dependency singleapplication
 include(../lib/singleapplication/singleapplication.pri)
+DEFINES += QAPPLICATION_CLASS=QApplication
 
 # dependency os library
 mac: {
