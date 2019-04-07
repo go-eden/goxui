@@ -1,7 +1,8 @@
+QT          += widgets qml quick concurrent core-private
+
 TEMPLATE    = lib
 CONFIG      += staticlib
-TARGET      = goxui-core
-QT          += widgets qml quick concurrent core-private
+TARGET      = goxui
 DEFINES     += GOXUI
 
 HEADERS += \
@@ -31,10 +32,10 @@ mac: {
 INCLUDEPATH += $$PWD
 
 # dependency qhotkey
-include(../qhotkey/qhotkey.pri)
+include(../lib/qhotkey/qhotkey.pri)
 
 # dependency singleapplication
-include(../singleapplication/singleapplication.pri)
+include(../lib/singleapplication/singleapplication.pri)
 DEFINES += QAPPLICATION_CLASS=QApplication
 
 # dependency os library

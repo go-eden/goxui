@@ -2,9 +2,9 @@
 // Created by sulin on 2018/1/12.
 //
 #include <QClipboard>
-#include <QPrinter>
 #include <QPainter>
-#include <QPrintDialog>
+//#include <QPrinter>
+//#include <QPrintDialog>
 #include <QThread>
 #include <QWindow>
 #include <QImage>
@@ -23,14 +23,14 @@ void UIApi::clearComponentCache() {
 }
 
 void UIApi::print(QVariant data){
-    QImage img = qvariant_cast<QImage>(data);
-    QPrinter printer;
-    QPrintDialog dialog(&printer, nullptr);
-    if(dialog.exec() == QDialog::Accepted) {
-        QPainter painter(&printer);
-        painter.drawImage(QPoint(0,0), img);
-        painter.end();
-    }
+//    QImage img = qvariant_cast<QImage>(data);
+//    QPrinter printer;
+//    QPrintDialog dialog(&printer, nullptr);
+//    if(dialog.exec() == QDialog::Accepted) {
+//        QPainter painter(&printer);
+//        painter.drawImage(QPoint(0,0), img);
+//        painter.end();
+//    }
 }
 
 void UIApi::setClipboard(QString text) {
