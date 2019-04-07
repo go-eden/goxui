@@ -1,5 +1,5 @@
 [submodule "cbridge/qhotkey"]
-	path = cbridge/qhotkey
+	path = cbridge/lib/qhotkey
 	url = git@github.com:Skycoder42/QHotkey.git
 [submodule "cbridge/singleapplication"]
 	path = cbridge/singleapplication

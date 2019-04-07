@@ -1,6 +1,8 @@
-QT       += widgets qml quick concurrent core-private
-
-DEFINES += GOXUI
+TEMPLATE    = lib
+CONFIG      += staticlib
+TARGET      = goxui-core
+QT          += widgets qml quick concurrent core-private
+DEFINES     += GOXUI
 
 HEADERS += \
         $$PWD/goxui.h \
