@@ -7,62 +7,70 @@ import (
 	"reflect"
 )
 
-// 属性元数据
+// Goxui field's metadata
 type field struct {
-	name     string      // 属性名称
-	fullname string      // 属性全名
-	cache    string      // 属性值缓存, 用于判断是否变化
-	ftype    core.Q_TYPE // 属性类型
+	name     string      // field's name, like 'IsLogin'
+	fullname string      // field's fullname, like 'User.IsLogin'
+	root     interface{} // field's root object, relative to 'fullname'
+	cache    *string     // field's value cache, used to judge whether it changes
+	qtype    core.Q_TYPE // field's Q_TYPE
 }
 
-// 查询属性值, 同时更新缓存
+// getter used to get the field's value, and update cache.
 func (f *field) getter() (v string) {
 	defer func() {
 		if r := recover(); r != nil {
-			logger.WarnF("get field[%v] failed, panic occured: %v", f.fullname, r)
+			log.WarnF("get field[%v] failed, panic occured: %v", f.fullname, r)
 		}
 	}()
-	owner := util.FindOwner(reflect.ValueOf(root), f.fullname)
+	// find owner
+	owner := util.FindOwner(reflect.ValueOf(f.root), f.fullname)
 	if owner.Kind() != reflect.Struct {
-		logger.WarnF("get field[%v] failed, can't find owner Struct", f.fullname)
+		log.WarnF("get field[%v] failed, can't find owner Struct", f.fullname)
 		return
 	}
+	// check it's real Get method
 	m := owner.Addr().MethodByName("Get" + f.name)
-	if m.Kind() == reflect.Func && m.Type().NumIn() == 0 && m.Type().NumOut() == 1 && core.ParseQType(m.Type().Out(0)) == f.ftype {
+	if m.Kind() == reflect.Func && m.Type().NumIn() == 0 && m.Type().NumOut() == 1 && core.ParseQType(m.Type().Out(0)) == f.qtype {
 		results := m.Call([]reflect.Value{})
 		v = util.ToString(results[0].Interface())
 	} else {
 		fieldV := owner.FieldByName(f.name)
 		v = util.ToString(fieldV.Interface())
 	}
-	logger.DebugF("get field[%v] done: %v", f.fullname, v)
-	f.cache = v
+	log.DebugF("get field[%v] done: %v", f.fullname, v)
+	// update cache
+	f.cache = &v
+
 	return
 }
 
-// 设置属性值
+// setter used to set the field's value
 func (f *field) setter(v string) {
 	defer func() {
 		if r := recover(); r != nil {
-			logger.WarnF("set field[%v] with param[%v] failed, panic occured: %v", f.fullname, v, r)
+			log.WarnF("set field[%v] with param[%v] failed, panic occured: %v", f.fullname, v, r)
 		}
 	}()
-	owner := util.FindOwner(reflect.ValueOf(root), f.fullname)
+	// find owner
+	owner := util.FindOwner(reflect.ValueOf(f.root), f.fullname)
 	for owner.Kind() != reflect.Struct {
-		logger.WarnF("set field[%v] failed, can't find owner Struct", f.fullname)
+		log.WarnF("set field[%v] failed, can't find owner Struct", f.fullname)
 		return
 	}
+	// convert input argument
 	var tmp interface{}
 	if err := json.Unmarshal([]byte(v), &tmp); err != nil {
 		tmp = v
 	}
+	// check it's real Set method.
 	m := owner.Addr().MethodByName("Set" + f.name)
-	if m.Kind() == reflect.Func && m.Type().NumOut() == 0 && m.Type().NumIn() == 1 && core.ParseQType(m.Type().In(0)) == f.ftype {
+	if m.Kind() == reflect.Func && m.Type().NumOut() == 0 && m.Type().NumIn() == 1 && core.ParseQType(m.Type().In(0)) == f.qtype {
 		argType := m.Type().In(0)
 		if arg, err := util.ConvertToValue(argType, tmp); err == nil {
 			m.Call([]reflect.Value{owner.Addr(), arg})
 		} else {
-			logger.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, argType, err)
+			log.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, argType, err)
 			return
 		}
 	} else {
@@ -70,14 +78,21 @@ func (f *field) setter(v string) {
 		if result, err := util.ConvertToValue(fieldV.Type(), tmp); err == nil {
 			fieldV.Set(result)
 		} else {
-			logger.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, fieldV.Type(), err)
+			log.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, fieldV.Type(), err)
+			return
 		}
 	}
-	logger.DebugF("set field[%v] done: %v", f.fullname, v)
+	log.DebugF("set field[%v] done: %v", f.fullname, v)
+	// update cache
+	f.cache = nil
 }
 
-// 检查当前属性是否更新
+// Check this field's value was changed or not
 func (f *field) checkChanged() bool {
-	oldVal := f.cache
+	if f.cache == nil {
+		return true
+	}
+	oldVal := *f.cache
+
 	return f.getter() != oldVal
 }

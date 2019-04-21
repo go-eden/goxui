@@ -6,8 +6,12 @@ import (
 	"reflect"
 )
 
+var log = slf4go.GetLogger("goxui")
+var fields []field
+var methods []method
+
 func init() {
-	logger.SetLevel(slf4go.LEVEL_WARN)
+	log.SetLevel(slf4go.LEVEL_WARN)
 }
 
 // 联动C接口中的ui_init, 初始化uilib并绑定root
@@ -67,20 +71,21 @@ func Flush() {
 
 // 将指定对象绑定入UI层, 对象中的属性、函数均会以相同名称暴露在UI中
 func BindObject(obj interface{}) {
+	var fields []field
+	var methods []method
 	var success bool
 	if fields, methods, success = scanMetaData(reflect.TypeOf(obj)); !success {
-		logger.WarnF("scan metadata of object[%v] failed.", obj)
+		log.WarnF("scan metadata of object[%v] failed.", obj)
 		return
 	}
-	for _, f := range fields {
-		tmp := f
-		core.AddField(tmp.fullname, tmp.ftype, tmp.getter, tmp.setter)
-		logger.InfoF("bind field: [%v], [%v]", tmp.fullname, tmp.ftype)
+	for i := range fields {
+		fields[i].root = obj
+		core.AddField(fields[i].fullname, fields[i].qtype, fields[i].getter, fields[i].setter)
+		log.DebugF("bind field: [%v], [%v]", fields[i].fullname, fields[i].qtype)
 	}
-	for _, m := range methods {
-		tmp := m
-		core.AddMethod(tmp.fullname, tmp.otype, tmp.inum, tmp.invoke)
-		logger.InfoF("bind method: %v(%v), %v", tmp.fullname, tmp.inum, tmp.otype)
+	for i := range methods {
+		methods[i].root = obj
+		core.AddMethod(methods[i].fullname, methods[i].otype, methods[i].inum, methods[i].invoke)
+		log.DebugF("bind method: %v(%v), %v", methods[i].fullname, methods[i].inum, methods[i].otype)
 	}
-	root = obj
 }

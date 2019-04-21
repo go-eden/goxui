@@ -30,7 +30,7 @@ var (
 	bucket  = "default" // default bucket's name
 )
 
-// fetch key's value
+// Fetch key's value
 func Get(bucket, key string) (val string, exists bool) {
 	if storage == nil {
 		panic("storage not init")
@@ -52,7 +52,7 @@ func Get(bucket, key string) (val string, exists bool) {
 	return
 }
 
-// setup key
+// Setup key's value
 func Set(bucket, key, val string) {
 	if storage == nil {
 		panic("storage not init")

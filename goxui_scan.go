@@ -3,20 +3,15 @@ package goxui
 import (
 	"github.com/sisyphsu/goxui/core"
 	"github.com/sisyphsu/goxui/util"
-	"github.com/sisyphsu/slf4go"
 	"reflect"
 )
 
-var logger = slf4go.GetLogger("")
-var root interface{}
-var fields []field
-var methods []method
-
-// 扫描指定对象, 返回属性和函数
+// Scan the specified type, return it owns fields and methods.
 func scanMetaData(otype reflect.Type) (fields []field, methods []method, success bool) {
 	if otype, success = util.FindStructPtrType(otype); !success {
 		return
 	}
+	// scan methods
 	for i := 0; i < otype.NumMethod(); i++ {
 		mtype := otype.Method(i)
 		item := method{}
@@ -32,23 +27,33 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 		}
 		methods = append(methods, item)
 	}
+	// scan fields
 	for i := 0; i < otype.Elem().NumField(); i++ {
 		ftype := otype.Elem().Field(i)
 		if ftype.Anonymous {
-			logger.InfoF("unsupported anonymous field with type[%v]", ftype.Type)
+			log.InfoF("unsupported anonymous field with type[%v]", ftype.Type)
 			continue
 		}
+		// not public
 		if ftype.Name[0] < 'A' || ftype.Name[0] > 'Z' {
-			logger.InfoF("ignore private field[%v]", ftype.Name)
+			log.InfoF("ignore no-public field[%v]", ftype.Name)
 			continue
 		}
-		switch ftype.Type.Kind() {
-		case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Chan, reflect.Func, reflect.Interface, reflect.UnsafePointer:
-			logger.InfoF("unsupported field[%v] with type[%v]", ftype.Name, ftype.Type)
-		case reflect.Struct, reflect.Ptr:
+		// normal qtype
+		qtype := core.ParseQType(ftype.Type)
+		if qtype != core.Q_TYPE_UNKNOWN {
+			item := field{}
+			item.name = ftype.Name
+			item.fullname = ftype.Name
+			item.qtype = qtype
+			fields = append(fields, item)
+			continue
+		}
+		// subtype
+		if ftype.Type.Kind() == reflect.Struct || ftype.Type.Kind() == reflect.Ptr {
 			subFields, subMethods, success := scanMetaData(ftype.Type)
 			if !success {
-				logger.InfoF("unsupported field[%v] with ptr", ftype.Name)
+				log.InfoF("unsupported field[%v] with ptr", ftype.Name)
 				continue
 			}
 			for _, subfield := range subFields {
@@ -59,13 +64,9 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 				submethod.fullname = ftype.Name + "." + submethod.fullname
 				methods = append(methods, submethod)
 			}
-		default:
-			item := field{}
-			item.name = ftype.Name
-			item.fullname = ftype.Name
-			item.ftype = core.ParseQType(ftype.Type)
-			fields = append(fields, item)
+			continue
 		}
+		log.InfoF("unsupported field[%v] with type[%v]", ftype.Name, ftype.Type)
 	}
 
 	return

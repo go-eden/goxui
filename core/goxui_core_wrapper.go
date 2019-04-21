@@ -24,7 +24,7 @@ func AddInitCallback(f func()) {
 	initCallbacks = append(initCallbacks, f)
 }
 
-// 联动C接口中的ui_init, 初始化uilib并绑定root
+// Forward Goxui's ui_init method, it will init Goxui and invoke ext's initCallback.
 func Init() {
 	argv := os.Args
 	argc := C.int(len(argv))
@@ -35,33 +35,33 @@ func Init() {
 	C.ui_init(argc, (**C.char)(unsafe.Pointer(cArgv)))
 	// invoke callback
 	if len(initCallbacks) > 0 {
-		for _, callback := range initCallbacks {
-			callback()
+		for _, initCallback := range initCallbacks {
+			initCallback()
 		}
 	}
 }
 
-// 封装C接口中的ui_add_resource函数. 添加资源文件, UI会将此资源作为RCC加载
+// Forward Goxui's ui_add_resource method, it will add RCC data into Qt resources system.
 func AddResourceData(prefix string, data []byte) {
 	cPrefix := C.CString(prefix)
 	C.ui_add_resource(cPrefix, (*C.char)(unsafe.Pointer(&data[0])))
 }
 
-// 封装C接口中的ui_add_resource_path函数. 将指定目录作为资源目录, 可用性存疑?
+// Forward Goxui's ui_add_resource_path method, it will add the specified path into resource path.
 func AddResourcePath(path string) {
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
 	C.ui_add_resource_path(cPath)
 }
 
-// 封装C接口中的ui_add_import_path函数. 利用identified modules
+// Forward Goxui's ui_add_import_path method, it could be used in identified modules
 func AddImportPath(path string) {
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
 	C.ui_add_import_path(cPath)
 }
 
-// 封装C接口中的ui_map_resource函数. 映射资源文件的搜索规则, 可用于灵活定制资源文件分布.
+// Forward Goxui's ui_map_resource method, it will register the specified resource into QML.
 func MapResource(prefix string, path string) {
 	cPrefix := C.CString(prefix)
 	cPath := C.CString(path)
@@ -70,14 +70,14 @@ func MapResource(prefix string, path string) {
 	C.ui_map_resource(cPrefix, cPath)
 }
 
-// 封装C接口中的ui_tool_set_http_proxy函数. 设置UI环境所采用的网络代理
+// Forward Goxui's ui_tool_set_http_proxy method, it will setup the Qt's network proxy configuration.
 func ToolSetHttpProxy(host string, port int) {
 	cHost := C.CString(host)
 	defer C.free(unsafe.Pointer(cHost))
 	C.ui_tool_set_http_proxy(cHost, C.int(port))
 }
 
-// 封装C接口中的ui_tool_set_debug_enabled函数. 设置是否启用debug日志
+// Forward Goxui's ui_tool_set_debug_enabled method, it will enable some debug features or not.
 func ToolSetDebugEnabled(enable bool) {
 	if enable {
 		C.ui_tool_set_debug_enabled(C.int(1))
@@ -86,7 +86,7 @@ func ToolSetDebugEnabled(enable bool) {
 	}
 }
 
-// 封装C中的ui_trigger_event函数, 触发UI中某个指定名称的事件
+// Forward Goxui's ui_trigger_event method, it will trigger the specified event.
 func TriggerEvent(name string, data interface{}) {
 	dtype := ParseQType(reflect.TypeOf(data))
 	_data := util.ToString(data)
@@ -98,7 +98,7 @@ func TriggerEvent(name string, data interface{}) {
 	C.ui_trigger_event(cName, cType, cData)
 }
 
-// 封装C中的ui_notify_field函数, 通知UI中某个属性已更新
+// Forward Goxui's ui_notify_field method, notify the specified property is changed.
 func NotifyField(name string) bool {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
@@ -110,7 +110,7 @@ func NotifyField(name string) bool {
 	return success
 }
 
-// 封装C接口中的ui_start函数. Run模式启动入口, 启动成功后将阻塞直至UI退出。
+// Forward Goxui's ui_start method, will block until fail or exit.
 func Start(root string) int {
 	cRoot := C.CString(root)
 	defer C.free(unsafe.Pointer(cRoot))

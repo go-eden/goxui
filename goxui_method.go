@@ -7,54 +7,60 @@ import (
 	"reflect"
 )
 
-// 函数元数据
+// Goxui method's metadata
 type method struct {
-	name     string      // 函数名称
-	fullname string      // 函数全名
-	otype    core.Q_TYPE // 函数出参类型
-	inum     int         // 函数入参数量
+	name     string      // method's name, like 'EnableNotice'
+	fullname string      // method's fullname, like 'User.Setting.EnableNotice'
+	root     interface{} // method's root instance relative to `fullname`
+	otype    core.Q_TYPE // method's return type, OBJECT for multi-out
+	inum     int         // method's input number
 }
 
-// 函数注入，封装（参数反序列化、结果序列化）
+// Wrap method's invocation, handle input & output parameters's serialization and deserialization.
 func (m *method) invoke(param string) (result string) {
 	defer func() {
 		if r := recover(); r != nil {
-			logger.WarnF("invoke [%v] failed, panic occured: %v", m.fullname, r)
+			log.WarnF("invoke [%v] failed, panic occured: %v", m.fullname, r)
 		}
 	}()
-	owner := util.FindOwner(reflect.ValueOf(root), m.fullname)
+	// find owner
+	owner := util.FindOwner(reflect.ValueOf(m.root), m.fullname)
 	if owner.Kind() != reflect.Struct {
-		logger.WarnF("invoke [%v] failed, can't find owner Struct", m.fullname)
+		log.WarnF("invoke [%v] failed, can't find owner Struct", m.fullname)
 		return
 	}
-	methodV := owner.Addr().MethodByName(m.name)
-	if methodV.Kind() != reflect.Func {
-		logger.WarnF("invoke [%v] failed, invalid func", m.fullname)
+	// find method
+	methodVal := owner.Addr().MethodByName(m.name)
+	if methodVal.Kind() != reflect.Func {
+		log.WarnF("invoke [%v] failed, invalid func", m.fullname)
 		return
 	}
+	// deserialization args array
 	var args []interface{}
 	if err := json.Unmarshal([]byte(param), &args); err != nil {
-		logger.WarnF("invoke [%v] failed, parse args[%v] failed: %v", m.fullname, param, err)
+		log.WarnF("invoke [%v] failed, parse args[%v] failed: %v", m.fullname, param, err)
 		return
 	}
-	if len(args) != methodV.Type().NumIn() {
-		logger.WarnF("invoke [%v] failed, number of args error: %v", m.fullname, param)
+	if len(args) != methodVal.Type().NumIn() {
+		log.WarnF("invoke [%v] failed, number of args error: %v", m.fullname, param)
 		return
 	}
-	argValues := make([]reflect.Value, methodV.Type().NumIn())
-	for i := 0; i < methodV.Type().NumIn(); i++ {
-		argType := methodV.Type().In(i)
+	// prepare input parameters
+	argValues := make([]reflect.Value, methodVal.Type().NumIn())
+	for i := 0; i < methodVal.Type().NumIn(); i++ {
+		argType := methodVal.Type().In(i)
 		arg := args[i]
 		if argVal, err := util.ConvertToValue(argType, arg); err != nil {
-			logger.WarnF("invoke [%v] failed, can't resolve argument[%v] as [%v]: %v", m.fullname, arg, argType, err)
+			log.WarnF("invoke [%v] failed, can't resolve argument[%v] as [%v]: %v", m.fullname, arg, argType, err)
 			return
 		} else {
 			argValues[i] = argVal
 		}
 	}
-	if vals := methodV.Call(argValues); len(vals) == 1 {
+	// invoke real method
+	if vals := methodVal.Call(argValues); len(vals) == 1 {
 		result = util.ToString(vals[0].Interface())
 	}
-	logger.DebugF("invoke [%v] success with args %v, result: %v", m.fullname, param, result)
+	log.DebugF("invoke [%v] success with args %v, result: %v", m.fullname, param, result)
 	return
 }

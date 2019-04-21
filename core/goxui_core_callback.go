@@ -33,13 +33,11 @@ var (
 func getField(cName *C.char) *C.char {
 	name := C.GoString(cName)
 	defer func() {
-		defer func() {
-			if r := recover(); r != nil {
-				fmt.Printf("getfield[%v] failed, panic occured: %v", name, r)
-			}
-		}()
+		if r := recover(); r != nil {
+			fmt.Printf("getfield[%v] failed, panic occured: %v", name, r)
+		}
 	}()
-	if reader, ok := readerCallbackMap[name]; ok {
+	if reader, ok := readerCallbackMap[name]; ok && reader != nil {
 		return C.CString(reader()) // free in c
 	} else {
 		fmt.Printf("invalid field, no reader: %v", name)
@@ -58,13 +56,11 @@ func setField(cName *C.char, cVal *C.char) {
 		return
 	}
 	defer func() {
-		defer func() {
-			if r := recover(); r != nil {
-				fmt.Printf("setField[%v] failed with param[%v], panic occured: %v", name, val, r)
-			}
-		}()
+		if r := recover(); r != nil {
+			fmt.Printf("setField[%v] failed with param[%v], panic occured: %v", name, val, r)
+		}
 	}()
-	if writer, ok := writerCallbackMap[name]; ok {
+	if writer, ok := writerCallbackMap[name]; ok && writer != nil {
 		writer(val)
 	} else {
 		fmt.Printf("invalid field, no writer: %v", name)
@@ -82,13 +78,11 @@ func invoke(cName *C.char, cData *C.char) *C.char {
 		return nil
 	}
 	defer func() {
-		defer func() {
-			if r := recover(); r != nil {
-				fmt.Printf("invoke [%v] failed with param[%v], panic occured: %v", name, data, r)
-			}
-		}()
+		if r := recover(); r != nil {
+			fmt.Printf("invoke [%v] failed with param[%v], panic occured: %v", name, data, r)
+		}
 	}()
-	if callback, ok := methodCallbackMap[name]; ok {
+	if callback, ok := methodCallbackMap[name]; ok || callback != nil {
 		return C.CString(callback(data)) // free in c
 	} else {
 		fmt.Printf("invalid method: %v", name)
@@ -96,7 +90,7 @@ func invoke(cName *C.char, cData *C.char) *C.char {
 	return nil
 }
 
-// 封装C接口中的ui_add_field函数, 向UI中新增一个变量
+// Add a golang filed into Goxui's environment, must provide reader and writer callback.
 func AddField(name string, fieldType Q_TYPE, reader func() string, writer func(string)) bool {
 	cName := C.CString(name)
 	cType := C.int(fieldType)
@@ -111,8 +105,11 @@ func AddField(name string, fieldType Q_TYPE, reader func() string, writer func(s
 	return success
 }
 
-// 封装C接口中的ui_add_method函数, 向UI中新增一个函数
+// Add a golang method into Goxui's environment
 func AddMethod(name string, retType Q_TYPE, argNum int, callback func(string) string) bool {
+	if callback == nil {
+		panic("callback is nil")
+	}
 	cName := C.CString(name)
 	cType := C.int(retType)
 	cArgNum := C.int(argNum)

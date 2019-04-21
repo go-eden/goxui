@@ -48,18 +48,3 @@ func GetString(key string, def string) string {
 	}
 	return val
 }
-
-//// 获取UUID, 只有第一次调用会创建新UUID, 并存储在storage中
-//func GetUUID() (u []byte) {
-//    if oldUUID := GetString("uuid", ""); oldUUID != "" {
-//        if tmp, err := hex.DecodeString(oldUUID); err == nil && len(tmp) == 16 {
-//            u = tmp
-//        }
-//    }
-//    if u == nil {
-//        tmp := uuid.NewV1() // 应该取硬件UUID
-//        u = tmp[:]
-//        SetString("uuid", hex.EncodeToString(u))
-//    }
-//    return
-//}
