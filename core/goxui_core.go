@@ -1,7 +1,7 @@
 package core
 
 /*
-#cgo LDFLAGS: -lgoxui
+#cgo LDFLAGS: -L./darwin -lgoxui
 
 #cgo darwin LDFLAGS: -F/usr/local/opt/qt/lib
 #cgo darwin LDFLAGS: -framework Carbon

@@ -1,7 +1,7 @@
 package web
 
 /*
-#cgo LDFLAGS: -lgoxui -lgoxui-web
+#cgo LDFLAGS: -L-L./darwin -lgoxui -lgoxui-web
 
 #cgo darwin LDFLAGS: -F/usr/local/opt/qt/lib
 
