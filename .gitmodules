@@ -1,6 +1,0 @@
-[submodule "cbridge/lib/qhotkey"]
-	path = cbridge/lib/qhotkey
-	url = git@github.com:Skycoder42/QHotkey.git
-[submodule "cbridge/lib/singleapplication"]
-	path = cbridge/lib/singleapplication
-	url = git@github.com:itay-grudev/SingleApplication.git
