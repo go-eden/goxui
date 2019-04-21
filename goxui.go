@@ -14,62 +14,63 @@ func init() {
 	log.SetLevel(slf4go.LEVEL_WARN)
 }
 
-// 联动C接口中的ui_init, 初始化uilib并绑定root
+// Initilize ui context, and QApplication.
 func Init() {
 	core.Init()
 }
 
-// 封装C接口中的ui_add_resource函数. 添加资源文件, UI会将此资源作为RCC加载
+// Add the specified RCC into Qt resources system.
 func AddResourceData(prefix string, data []byte) {
 	core.AddResourceData(prefix, data)
 }
 
-// 封装C接口中的ui_add_resource_path函数. 将指定目录作为资源目录, 可用性存疑?
+// Add the specified path into Qt resource path.
 func AddResourcePath(path string) {
 	core.AddResourcePath(path)
 }
 
-// 封装C接口中的ui_add_import_path函数. 利用identified modules
+// Add the specified path into Qt's import path, could be used for identified modules.
 func AddImportPath(path string) {
 	core.AddImportPath(path)
 }
 
-// 封装C接口中的ui_map_resource函数. 映射资源文件的搜索规则, 可用于灵活定制资源文件分布.
+// Add new resource's mapping role.
+// <d>Unsupported： In QML, could use `${prefix}:` to locate resource directly.</d>
 func MapResource(prefix string, path string) {
 	core.MapResource(prefix, path)
 }
 
-// 封装C接口中的ui_tool_set_http_proxy函数. 设置UI环境所采用的网络代理
+// TOOL: setup application's http proxy, only for Qt side.
 func SetHttpProxy(host string, port int) {
 	core.ToolSetHttpProxy(host, port)
 }
 
-// 封装C接口中的ui_tool_set_debug_enabled函数. 设置是否启用debug日志
+// TOOL: setup whether enable debug level log or not.
 func SetDebugEnabled(enable bool) {
 	core.ToolSetDebugEnabled(enable)
 }
 
-// 封装C接口中的ui_start函数. Run模式启动入口, 启动成功后将阻塞直至UI退出。
+// UI's entry-point, will block until fail or exit.
 func Start(root string) int {
 	return core.Start(root)
 }
 
-// 封装C中的ui_trigger_event函数, 触发UI中某个指定名称的事件
+// Trigger the named event, with specified data.
 func TriggerEvent(name string, data interface{}) {
 	core.TriggerEvent(name, data)
 }
 
-// 刷新UI, 可用于通知属性更新
+// Flush add fields, notify Qt if value changed.
 func Flush() {
 	for _, f := range fields {
 		if !f.checkChanged() {
 			continue
 		}
-		core.NotifyField(f.fullname) // 通知字段更新
+		core.NotifyField(f.fullname) // notify value changed
 	}
 }
 
-// 将指定对象绑定入UI层, 对象中的属性、函数均会以相同名称暴露在UI中
+// Bind the specified object into QML side, them will be exposed in QML context.
 func BindObject(obj interface{}) {
 	var fields []field
 	var methods []method

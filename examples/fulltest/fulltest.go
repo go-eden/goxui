@@ -100,6 +100,5 @@ func main() {
 		goxui.TriggerEvent("event_object", Param{"啦啦啦", 3333333})
 		goxui.TriggerEvent("event_array", []Param{{"啦啦啦", 3333333}, {"啦啦啦444", 3333333}})
 	}()
-	goxui.MapResource("img", path)
 	goxui.Start(filepath.Join(path, "qml", "fulltest.qml"))
 }
