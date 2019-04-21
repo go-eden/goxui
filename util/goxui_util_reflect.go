@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-// 寻找指定对象所属的指针类型, 如果数据类型不是struct则返回失败
 func FindStructPtrType(t reflect.Type) (reflect.Type, bool) {
 	if t.Kind() == reflect.Struct {
 		t = reflect.PtrTo(t)
@@ -18,7 +17,6 @@ func FindStructPtrType(t reflect.Type) (reflect.Type, bool) {
 	return t, t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Struct
 }
 
-// 将string转换为指定类型的value
 func ConvertToValue(t reflect.Type, val interface{}) (result reflect.Value, err error) {
 	if val == nil {
 		result = reflect.Zero(t)
@@ -117,16 +115,15 @@ func ConvertToValue(t reflect.Type, val interface{}) (result reflect.Value, err 
 	return
 }
 
-// 根据属性名称，寻找定位owner节点, 返回Struct
 func FindOwner(val reflect.Value, name string) (result reflect.Value) {
 	if !val.IsValid() {
-		return // 无效
+		return // invalid
 	}
 	for val.Kind() == reflect.Ptr {
 		val = val.Elem()
 	}
 	if val.Kind() != reflect.Struct {
-		return // 无效
+		return // invalid
 	}
 	if !strings.Contains(name, ".") {
 		return val

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/sisyphsu/goxui"
-	_ "github.com/sisyphsu/goxui/web"
+	_ "github.com/sisyphsu/goxui/ext/web"
 	"path/filepath"
 	"runtime"
 )

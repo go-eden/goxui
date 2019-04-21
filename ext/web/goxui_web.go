@@ -17,5 +17,16 @@ package web
 #cgo darwin LDFLAGS: -framework QtNetwork
 #cgo darwin LDFLAGS: -framework QtConcurrent
 #cgo darwin LDFLAGS: -framework QtWebEngine
+
+#include "goxui_web.h"
 */
 import "C"
+import "github.com/sisyphsu/goxui/core"
+
+func init() {
+	core.AddInitCallback(doInit)
+}
+
+func doInit() {
+	C.ui_init_web()
+}
