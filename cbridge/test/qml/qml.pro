@@ -1,4 +1,0 @@
-TARGET = qml
-TEMPLATE = app 
-
-RESOURCES += /
