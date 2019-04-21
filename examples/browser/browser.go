@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/sisyphsu/goxui"
 	_ "github.com/sisyphsu/goxui/ext/web"
-	"path/filepath"
 	"runtime"
 )
 
@@ -11,10 +10,7 @@ import (
 func main() {
 	runtime.LockOSThread()
 
-	_, filename, _, _ := runtime.Caller(0)
-	path := filepath.Dir(filename)
-
 	goxui.Init()
 
-	goxui.Start(filepath.Join(path, "ui", "BrowserWindow.qml"))
+	goxui.StartRelative("ui", "BrowserWindow.qml")
 }

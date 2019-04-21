@@ -1,8 +1,7 @@
 package core
 
 /*
-#cgo LDFLAGS: -L./darwin -lgoxui
-
+#cgo darwin LDFLAGS: -L./darwin
 #cgo darwin LDFLAGS: -F/usr/local/opt/qt/lib
 #cgo darwin LDFLAGS: -framework Carbon
 #cgo darwin LDFLAGS: -framework Cocoa
@@ -14,5 +13,7 @@ package core
 #cgo darwin LDFLAGS: -framework QtConcurrent
 #cgo darwin LDFLAGS: -framework QtCore
 #cgo darwin LDFLAGS: -lc++
+
+#cgo LDFLAGS: -lgoxui
 */
 import "C"
