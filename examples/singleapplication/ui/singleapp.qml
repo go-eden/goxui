@@ -38,4 +38,13 @@ Window {
             z: 1
         }
     }
+
+    Event {
+        key: "app_active"
+        onActive: {
+            mainWindow.raise()
+            mainWindow.show()
+        }
+    }
+
 }
