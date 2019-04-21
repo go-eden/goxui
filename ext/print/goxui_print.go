@@ -1,7 +1,7 @@
 package print
 
 /*
-#cgo LDFLAGS: -L./darwin -lgoxui -lgoxui-print
+#cgo LDFLAGS: -L./darwin -lgoxui-print
 
 #cgo darwin LDFLAGS: -F/usr/local/opt/qt/lib
 
