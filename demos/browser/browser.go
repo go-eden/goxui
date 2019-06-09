@@ -12,5 +12,5 @@ func main() {
 
 	goxui.Init()
 
-	goxui.StartRelative("ui", "BrowserWindow.qml")
+	goxui.StartRelative("ui", "App.qml")
 }
