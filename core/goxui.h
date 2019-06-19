@@ -31,6 +31,12 @@ extern "C" {  // only need to export C interface if used by C++ source code
 API void ui_init(int argc, char **argv);
 
 /**
+ * setup qt's logger
+ * @param logger Outter logger
+ */
+API void ui_set_logger(void (*logger)(int, char *));
+
+/**
  * Add specified object into QML's context, MUST BE QObject
  *
  * @param name The name of QML's context property
