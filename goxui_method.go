@@ -12,7 +12,7 @@ type method struct {
 	name     string      // method's name, like 'EnableNotice'
 	fullname string      // method's fullname, like 'User.Setting.EnableNotice'
 	root     interface{} // method's root instance relative to `fullname`
-	otype    core.QTYPE  // method's return type, OBJECT for multi-out
+	otype    core.QType  // method's return type, OBJECT for multi-out
 	inum     int         // method's input number
 }
 

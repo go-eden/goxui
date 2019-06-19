@@ -19,9 +19,9 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 		item.fullname = mtype.Name
 		item.inum = mtype.Type.NumIn() - 1
 		if mtype.Type.NumOut() == 0 {
-			item.otype = core.Q_TYPE_VOID
+			item.otype = core.QVoidType
 		} else if mtype.Type.NumOut() > 1 {
-			item.otype = core.Q_TYPE_OBJECT
+			item.otype = core.QObjectType
 		} else {
 			item.otype = core.ParseQType(mtype.Type.Out(0))
 		}
@@ -41,7 +41,7 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 		}
 		// normal qtype
 		qtype := core.ParseQType(ftype.Type)
-		if qtype != core.Q_TYPE_UNKNOWN {
+		if qtype != core.QUnknownType {
 			item := field{}
 			item.name = ftype.Name
 			item.fullname = ftype.Name

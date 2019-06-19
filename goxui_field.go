@@ -13,7 +13,7 @@ type field struct {
 	fullname string      // field's fullname, like 'User.IsLogin'
 	root     interface{} // field's root object, relative to 'fullname'
 	cache    *string     // field's value cache, used to judge whether it changes
-	qtype    core.QTYPE  // field's QTYPE
+	qtype    core.QType  // field's QType
 }
 
 // getter used to get the field's value, and update cache.

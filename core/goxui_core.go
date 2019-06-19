@@ -17,6 +17,6 @@ package core
 #cgo LDFLAGS: -lgoxui
 */
 import "C"
-import slog "github.com/go-eden/slf4go"
+import "github.com/go-eden/slf4go"
 
 var log = slog.GetLogger()

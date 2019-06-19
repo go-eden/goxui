@@ -2,53 +2,53 @@ package core
 
 import "reflect"
 
-type QTYPE int
+type QType int
 
 const (
-	Q_TYPE_UNKNOWN       = -1
-	Q_TYPE_VOID    QTYPE = iota
-	Q_TYPE_BOOL
-	Q_TYPE_INT
-	Q_TYPE_LONG
-	Q_TYPE_DOUBLE
-	Q_TYPE_OBJECT
-	Q_TYPE_STRING
+	QUnknownType       = -1
+	QVoidType    QType = iota
+	QBoolType
+	QIntType
+	QLongType
+	QDoubleType
+	QObjectType
+	QStringType
 )
 
-func (t QTYPE) String() string {
+func (t QType) String() string {
 	switch t {
-	case Q_TYPE_VOID:
+	case QVoidType:
 		return "void"
-	case Q_TYPE_BOOL:
+	case QBoolType:
 		return "bool"
-	case Q_TYPE_INT:
+	case QIntType:
 		return "int"
-	case Q_TYPE_LONG:
+	case QLongType:
 		return "long"
-	case Q_TYPE_DOUBLE:
+	case QDoubleType:
 		return "double"
-	case Q_TYPE_OBJECT:
+	case QObjectType:
 		return "object"
-	case Q_TYPE_STRING:
+	case QStringType:
 		return "string"
 	default:
 		return "unknown"
 	}
 }
 
-func ParseQType(t reflect.Type) QTYPE {
+func ParseQType(t reflect.Type) QType {
 	kind := t.Kind()
 	if kind >= reflect.Int && kind <= reflect.Uintptr {
-		return Q_TYPE_LONG
+		return QLongType
 	} else if kind >= reflect.Float32 && kind <= reflect.Float64 {
-		return Q_TYPE_DOUBLE
+		return QDoubleType
 	} else if kind == reflect.Bool {
-		return Q_TYPE_BOOL
+		return QBoolType
 	} else if kind == reflect.Array || kind == reflect.Slice || kind == reflect.Struct {
-		return Q_TYPE_OBJECT
+		return QObjectType
 	} else if kind == reflect.String {
-		return Q_TYPE_STRING
+		return QStringType
 	} else {
-		return Q_TYPE_UNKNOWN
+		return QUnknownType
 	}
 }

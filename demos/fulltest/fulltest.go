@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-eden/goxui"
 	"github.com/go-eden/goxui/util"
+	slog "github.com/go-eden/slf4go"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -45,7 +46,7 @@ func (r *Root) Test2(s1 string, s2 string) []interface{} {
 }
 
 func (r *Root) Test3(s string, p Param) {
-	logger.InfoF("########## s[%v], param[%v]", s, p)
+	slog.Infof("########## s[%v], param[%v]", s, p)
 }
 
 type Body struct {
