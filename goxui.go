@@ -2,14 +2,14 @@ package goxui
 
 import (
 	"github.com/go-eden/goxui/core"
-	slf4go "github.com/go-eden/slf4go"
+	slog "github.com/go-eden/slf4go"
 	"reflect"
 )
 
 var fields []field
 var methods []method
 
-var log = slf4go.GetLogger()
+var log = slog.GetLogger()
 
 // Initilize ui context, and QApplication.
 func Init() {

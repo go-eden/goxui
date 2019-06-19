@@ -20,7 +20,6 @@ static inline int _ui_add_method(char *name, int retType, int argNum) {
 import "C"
 import (
 	"encoding/base64"
-	"fmt"
 )
 
 var (
@@ -34,13 +33,13 @@ func getField(cName *C.char) *C.char {
 	name := C.GoString(cName)
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("getfield[%v] failed, panic occured: %v", name, r)
+			log.Panicf("getfield[%v] failed, panic occured: %v", name, r)
 		}
 	}()
 	if reader, ok := readerCallbackMap[name]; ok && reader != nil {
 		return C.CString(reader()) // free in c
 	} else {
-		fmt.Printf("invalid field, no reader: %v", name)
+		log.Info("invalid field, no reader:", name)
 	}
 	return nil
 }
@@ -49,21 +48,21 @@ func getField(cName *C.char) *C.char {
 func setField(cName *C.char, cVal *C.char) {
 	name := C.GoString(cName)
 	val := C.GoString(cVal)
-	if bs, err := base64.StdEncoding.DecodeString(val); err == nil {
-		val = string(bs)
-	} else {
-		fmt.Printf("setField %v failed, parse data [%v] failed: %v", name, val, err)
+	if bs, err := base64.StdEncoding.DecodeString(val); err != nil {
+		log.Errorf("setField %v failed, parse data [%v] failed: %v", name, val, err)
 		return
+	} else {
+		val = string(bs)
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("setField[%v] failed with param[%v], panic occured: %v", name, val, r)
+			log.Panicf("setField[%v] failed with param[%v], panic occured: %v", name, val, r)
 		}
 	}()
 	if writer, ok := writerCallbackMap[name]; ok && writer != nil {
 		writer(val)
 	} else {
-		fmt.Printf("invalid field, no writer: %v", name)
+		log.Warnf("invalid field, no writer: %v", name)
 	}
 }
 
@@ -74,18 +73,18 @@ func invoke(cName *C.char, cData *C.char) *C.char {
 	if bs, err := base64.StdEncoding.DecodeString(data); err == nil {
 		data = string(bs)
 	} else {
-		fmt.Printf("invoke %v failed, parse data [%v] failed: %v", name, data, err)
+		log.Errorf("invoke %v failed, parse data [%v] failed: %v", name, data, err)
 		return nil
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("invoke [%v] failed with param[%v], panic occured: %v", name, data, r)
+			log.Panicf("invoke [%v] failed with param[%v], panic occured: %v", name, data, r)
 		}
 	}()
 	if callback, ok := methodCallbackMap[name]; ok || callback != nil {
 		return C.CString(callback(data)) // free in c
 	} else {
-		fmt.Printf("invalid method: %v", name)
+		log.Warnf("invalid method: %v", name)
 	}
 	return nil
 }
@@ -100,7 +99,7 @@ func AddField(name string, fieldType QTYPE, reader func() string, writer func(st
 		readerCallbackMap[name] = reader
 		writerCallbackMap[name] = writer
 	} else {
-		fmt.Printf("addField failed: %s", name)
+		log.Warnf("addField failed: %s", name)
 	}
 	return success
 }
@@ -118,7 +117,7 @@ func AddMethod(name string, retType QTYPE, argNum int, callback func(string) str
 	if success {
 		methodCallbackMap[name] = callback
 	} else {
-		fmt.Printf("addMethod failed: %s", name)
+		log.Warnf("addMethod failed: %s", name)
 	}
 	return success
 }
