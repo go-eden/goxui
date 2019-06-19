@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/sisyphsu/goxui"
+	"github.com/go-eden/goxui"
 	"os"
 	"runtime"
 )

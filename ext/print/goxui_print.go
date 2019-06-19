@@ -20,7 +20,7 @@ package print
 #include "goxui_print.h"
 */
 import "C"
-import "github.com/sisyphsu/goxui/core"
+import "github.com/go-eden/goxui/core"
 
 func init() {
 	core.AddInitCallback(doInit)

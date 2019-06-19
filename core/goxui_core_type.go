@@ -2,11 +2,11 @@ package core
 
 import "reflect"
 
-type Q_TYPE int
+type QTYPE int
 
 const (
-	Q_TYPE_UNKNOWN        = -1
-	Q_TYPE_VOID    Q_TYPE = iota
+	Q_TYPE_UNKNOWN       = -1
+	Q_TYPE_VOID    QTYPE = iota
 	Q_TYPE_BOOL
 	Q_TYPE_INT
 	Q_TYPE_LONG
@@ -15,7 +15,7 @@ const (
 	Q_TYPE_STRING
 )
 
-func (t Q_TYPE) String() string {
+func (t QTYPE) String() string {
 	switch t {
 	case Q_TYPE_VOID:
 		return "void"
@@ -36,7 +36,7 @@ func (t Q_TYPE) String() string {
 	}
 }
 
-func ParseQType(t reflect.Type) Q_TYPE {
+func ParseQType(t reflect.Type) QTYPE {
 	kind := t.Kind()
 	if kind >= reflect.Int && kind <= reflect.Uintptr {
 		return Q_TYPE_LONG

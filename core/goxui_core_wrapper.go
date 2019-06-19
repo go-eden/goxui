@@ -12,7 +12,7 @@ static void* allocArgv(int argc) {
 import "C"
 import (
 	"fmt"
-	"github.com/sisyphsu/goxui/util"
+	"github.com/go-eden/goxui/util"
 	"os"
 	"reflect"
 	"unsafe"

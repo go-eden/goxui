@@ -1,15 +1,12 @@
 package main
 
 import (
-	"github.com/sisyphsu/goxui"
-	"github.com/sisyphsu/goxui/util"
-	"github.com/sisyphsu/slf4go"
+	"github.com/go-eden/goxui"
+	"github.com/go-eden/goxui/util"
 	"path/filepath"
 	"runtime"
 	"time"
 )
-
-var logger = slf4go.GetLogger("")
 
 type Param struct {
 	Name string

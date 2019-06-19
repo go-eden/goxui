@@ -2,8 +2,8 @@ package goxui
 
 import (
 	"encoding/json"
-	"github.com/sisyphsu/goxui/core"
-	"github.com/sisyphsu/goxui/util"
+	"github.com/go-eden/goxui/core"
+	"github.com/go-eden/goxui/util"
 	"reflect"
 )
 
@@ -13,20 +13,20 @@ type field struct {
 	fullname string      // field's fullname, like 'User.IsLogin'
 	root     interface{} // field's root object, relative to 'fullname'
 	cache    *string     // field's value cache, used to judge whether it changes
-	qtype    core.Q_TYPE // field's Q_TYPE
+	qtype    core.QTYPE  // field's QTYPE
 }
 
 // getter used to get the field's value, and update cache.
 func (f *field) getter() (v string) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.WarnF("get field[%v] failed, panic occured: %v", f.fullname, r)
+			log.Warnf("get field[%v] failed, panic occured: %v", f.fullname, r)
 		}
 	}()
 	// find owner
 	owner := util.FindOwner(reflect.ValueOf(f.root), f.fullname)
 	if owner.Kind() != reflect.Struct {
-		log.WarnF("get field[%v] failed, can't find owner Struct", f.fullname)
+		log.Warnf("get field[%v] failed, can't find owner Struct", f.fullname)
 		return
 	}
 	// check it's real Get method
@@ -38,7 +38,7 @@ func (f *field) getter() (v string) {
 		fieldV := owner.FieldByName(f.name)
 		v = util.ToString(fieldV.Interface())
 	}
-	log.DebugF("get field[%v] done: %v", f.fullname, v)
+	log.Debugf("get field[%v] done: %v", f.fullname, v)
 	// update cache
 	f.cache = &v
 
@@ -49,13 +49,13 @@ func (f *field) getter() (v string) {
 func (f *field) setter(v string) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.WarnF("set field[%v] with param[%v] failed, panic occured: %v", f.fullname, v, r)
+			log.Warnf("set field[%v] with param[%v] failed, panic occured: %v", f.fullname, v, r)
 		}
 	}()
 	// find owner
 	owner := util.FindOwner(reflect.ValueOf(f.root), f.fullname)
 	for owner.Kind() != reflect.Struct {
-		log.WarnF("set field[%v] failed, can't find owner Struct", f.fullname)
+		log.Warnf("set field[%v] failed, can't find owner Struct", f.fullname)
 		return
 	}
 	// convert input argument
@@ -70,7 +70,7 @@ func (f *field) setter(v string) {
 		if arg, err := util.ConvertToValue(argType, tmp); err == nil {
 			m.Call([]reflect.Value{owner.Addr(), arg})
 		} else {
-			log.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, argType, err)
+			log.Warnf("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, argType, err)
 			return
 		}
 	} else {
@@ -78,11 +78,11 @@ func (f *field) setter(v string) {
 		if result, err := util.ConvertToValue(fieldV.Type(), tmp); err == nil {
 			fieldV.Set(result)
 		} else {
-			log.WarnF("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, fieldV.Type(), err)
+			log.Warnf("set field[%v] failed, can't resolve [%v] as [%v]: %v", f.fullname, v, fieldV.Type(), err)
 			return
 		}
 	}
-	log.DebugF("set field[%v] done: %v", f.fullname, v)
+	log.Debugf("set field[%v] done: %v", f.fullname, v)
 	// update cache
 	f.cache = nil
 }

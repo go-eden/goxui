@@ -1,9 +1,9 @@
-module github.com/sisyphsu/goxui
+module github.com/go-eden/goxui
 
 go 1.12
 
 require (
 	github.com/boltdb/bolt v1.3.1
-	github.com/sisyphsu/slf4go v0.0.0-20180104114457-28a65cc2a84b
+	github.com/go-eden/slf4go v0.0.0-20190618132424-a173521a7718
 	golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed // indirect
 )

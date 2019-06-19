@@ -91,7 +91,7 @@ func invoke(cName *C.char, cData *C.char) *C.char {
 }
 
 // Add a golang filed into Goxui's environment, must provide reader and writer callback.
-func AddField(name string, fieldType Q_TYPE, reader func() string, writer func(string)) bool {
+func AddField(name string, fieldType QTYPE, reader func() string, writer func(string)) bool {
 	cName := C.CString(name)
 	cType := C.int(fieldType)
 	cResult := C._ui_add_field(cName, cType)
@@ -106,7 +106,7 @@ func AddField(name string, fieldType Q_TYPE, reader func() string, writer func(s
 }
 
 // Add a golang method into Goxui's environment
-func AddMethod(name string, retType Q_TYPE, argNum int, callback func(string) string) bool {
+func AddMethod(name string, retType QTYPE, argNum int, callback func(string) string) bool {
 	if callback == nil {
 		panic("callback is nil")
 	}

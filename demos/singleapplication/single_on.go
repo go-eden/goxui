@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sisyphsu/goxui"
+	"github.com/go-eden/goxui"
 	"runtime"
 )
 

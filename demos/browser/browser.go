@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/sisyphsu/goxui"
-	_ "github.com/sisyphsu/goxui/ext/web"
+	"github.com/go-eden/goxui"
+	_ "github.com/go-eden/goxui/ext/web"
 	"runtime"
 )
 

@@ -1,18 +1,15 @@
 package goxui
 
 import (
-	"github.com/sisyphsu/goxui/core"
-	"github.com/sisyphsu/slf4go"
+	"github.com/go-eden/goxui/core"
+	slf4go "github.com/go-eden/slf4go"
 	"reflect"
 )
 
-var log = slf4go.GetLogger("goxui")
 var fields []field
 var methods []method
 
-func init() {
-	log.SetLevel(slf4go.LEVEL_WARN)
-}
+var log = slf4go.GetLogger()
 
 // Initilize ui context, and QApplication.
 func Init() {
@@ -76,17 +73,17 @@ func BindObject(obj interface{}) {
 	var methods []method
 	var success bool
 	if fields, methods, success = scanMetaData(reflect.TypeOf(obj)); !success {
-		log.WarnF("scan metadata of object[%v] failed.", obj)
+		log.Warnf("scan metadata of object[%v] failed.", obj)
 		return
 	}
 	for i := range fields {
 		fields[i].root = obj
 		core.AddField(fields[i].fullname, fields[i].qtype, fields[i].getter, fields[i].setter)
-		log.DebugF("bind field: [%v], [%v]", fields[i].fullname, fields[i].qtype)
+		log.Debugf("bind field: [%v], [%v]", fields[i].fullname, fields[i].qtype)
 	}
 	for i := range methods {
 		methods[i].root = obj
 		core.AddMethod(methods[i].fullname, methods[i].otype, methods[i].inum, methods[i].invoke)
-		log.DebugF("bind method: %v(%v), %v", methods[i].fullname, methods[i].inum, methods[i].otype)
+		log.Debugf("bind method: %v(%v), %v", methods[i].fullname, methods[i].inum, methods[i].otype)
 	}
 }
