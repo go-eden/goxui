@@ -31,15 +31,18 @@ var (
 //export getField
 func getField(cName *C.char) *C.char {
 	name := C.GoString(cName)
+	log.Debugf("get field[%v]", name)
 	defer func() {
 		if r := recover(); r != nil {
-			log.Panicf("getfield[%v] failed, panic occured: %v", name, r)
+			log.Panicf("get field[%v] error: %v", name, r)
 		}
 	}()
 	if reader, ok := readerCallbackMap[name]; ok && reader != nil {
-		return C.CString(reader()) // free in c
+		val := reader()
+		log.Debugf("get field[%v] done: %v", name, val)
+		return C.CString(val) // free in c
 	} else {
-		log.Info("invalid field, no reader:", name)
+		log.Debugf("get field[%v] failed, no reader", name)
 	}
 	return nil
 }
@@ -48,21 +51,23 @@ func getField(cName *C.char) *C.char {
 func setField(cName *C.char, cVal *C.char) {
 	name := C.GoString(cName)
 	val := C.GoString(cVal)
+	log.Debugf("set field[%v]: %v", name, val)
+	defer func() {
+		if r := recover(); r != nil {
+			log.Panicf("set field[%v] error: %v, %v", name, val, r)
+		}
+	}()
 	if bs, err := base64.StdEncoding.DecodeString(val); err != nil {
 		log.Errorf("setField %v failed, parse data [%v] failed: %v", name, val, err)
 		return
 	} else {
 		val = string(bs)
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			log.Panicf("setField[%v] failed with param[%v], panic occured: %v", name, val, r)
-		}
-	}()
 	if writer, ok := writerCallbackMap[name]; ok && writer != nil {
 		writer(val)
+		log.Debugf("set field[%v] done: %v", name, val)
 	} else {
-		log.Warnf("invalid field, no writer: %v", name)
+		log.Warnf("set field[%v] failed, no writer: %v", name, val)
 	}
 }
 
@@ -70,27 +75,31 @@ func setField(cName *C.char, cVal *C.char) {
 func invoke(cName *C.char, cData *C.char) *C.char {
 	name := C.GoString(cName)
 	data := C.GoString(cData)
+	log.Debugf("invoke [%v] with args %v", name, data)
+	defer func() {
+		if r := recover(); r != nil {
+			log.Panicf("invoke [%v] error: %v", name, r)
+		}
+	}()
 	if bs, err := base64.StdEncoding.DecodeString(data); err == nil {
 		data = string(bs)
 	} else {
-		log.Errorf("invoke %v failed, parse data [%v] failed: %v", name, data, err)
+		log.Errorf("invoke [%v] failed, parse data [%v] failed: %v", name, data, err)
 		return nil
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			log.Panicf("invoke [%v] failed with param[%v], panic occured: %v", name, data, r)
-		}
-	}()
 	if callback, ok := methodCallbackMap[name]; ok || callback != nil {
-		return C.CString(callback(data)) // free in c
+		result := callback(data)
+		log.Debugf("invoke [%v] success with args %v, result: %v", name, data, result)
+		return C.CString(result) // free in c
 	} else {
-		log.Warnf("invalid method: %v", name)
+		log.Warnf("invoke [%v] failed, invalid method.", name)
 	}
 	return nil
 }
 
 // Add a golang filed into Goxui's environment, must provide reader and writer callback.
 func AddField(name string, fieldType QType, reader func() string, writer func(string)) bool {
+	log.Infof("AddField: %v, %v", name, fieldType)
 	cName := C.CString(name)
 	cType := C.int(fieldType)
 	cResult := C._ui_add_field(cName, cType)
@@ -106,9 +115,7 @@ func AddField(name string, fieldType QType, reader func() string, writer func(st
 
 // Add a golang method into Goxui's environment
 func AddMethod(name string, retType QType, argNum int, callback func(string) string) bool {
-	if callback == nil {
-		panic("callback is nil")
-	}
+	log.Infof("AddMethod: %v(%d)=>%v", name, argNum, retType)
 	cName := C.CString(name)
 	cType := C.int(retType)
 	cArgNum := C.int(argNum)

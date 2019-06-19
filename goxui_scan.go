@@ -31,12 +31,12 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 	for i := 0; i < otype.Elem().NumField(); i++ {
 		ftype := otype.Elem().Field(i)
 		if ftype.Anonymous {
-			log.Infof("unsupported anonymous field with type[%v]", ftype.Type)
+			log.Infof("unsupported anonymous field with type: %v", ftype.Type)
 			continue
 		}
 		// not public
 		if ftype.Name[0] < 'A' || ftype.Name[0] > 'Z' {
-			log.Infof("ignore no-public field[%v]", ftype.Name)
+			log.Infof("ignore no-public field: %v", ftype.Name)
 			continue
 		}
 		// normal qtype
@@ -53,7 +53,7 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 		if ftype.Type.Kind() == reflect.Struct || ftype.Type.Kind() == reflect.Ptr {
 			subFields, subMethods, success := scanMetaData(ftype.Type)
 			if !success {
-				log.Infof("unsupported field[%v] with ptr", ftype.Name)
+				log.Infof("unsupported field with ptr: %v", ftype.Name)
 				continue
 			}
 			for _, subfield := range subFields {
@@ -66,7 +66,7 @@ func scanMetaData(otype reflect.Type) (fields []field, methods []method, success
 			}
 			continue
 		}
-		log.Infof("unsupported field[%v] with type[%v]", ftype.Name, ftype.Type)
+		log.Infof("unsupported field[%v] with type: %v", ftype.Name, ftype.Type)
 	}
 
 	return

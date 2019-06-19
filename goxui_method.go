@@ -18,9 +18,10 @@ type method struct {
 
 // Wrap method's invocation, handle input & output parameters's serialization and deserialization.
 func (m *method) invoke(param string) (result string) {
+	log.Debugf("invoke [%v] with args %v", m.fullname, param)
 	defer func() {
 		if r := recover(); r != nil {
-			log.Warnf("invoke [%v] failed, panic occured: %v", m.fullname, r)
+			log.Panicf("invoke [%v] error: %v", m.fullname, r)
 		}
 	}()
 	// find owner
@@ -61,6 +62,5 @@ func (m *method) invoke(param string) (result string) {
 	if vals := methodVal.Call(argValues); len(vals) == 1 {
 		result = util.ToString(vals[0].Interface())
 	}
-	log.Debugf("invoke [%v] success with args %v, result: %v", m.fullname, param, result)
 	return
 }

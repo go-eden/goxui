@@ -18,11 +18,6 @@ type field struct {
 
 // getter used to get the field's value, and update cache.
 func (f *field) getter() (v string) {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Warnf("get field[%v] failed, panic occured: %v", f.fullname, r)
-		}
-	}()
 	// find owner
 	owner := util.FindOwner(reflect.ValueOf(f.root), f.fullname)
 	if owner.Kind() != reflect.Struct {
@@ -38,20 +33,13 @@ func (f *field) getter() (v string) {
 		fieldV := owner.FieldByName(f.name)
 		v = util.ToString(fieldV.Interface())
 	}
-	log.Debugf("get field[%v] done: %v", f.fullname, v)
 	// update cache
 	f.cache = &v
-
 	return
 }
 
 // setter used to set the field's value
 func (f *field) setter(v string) {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Warnf("set field[%v] with param[%v] failed, panic occured: %v", f.fullname, v, r)
-		}
-	}()
 	// find owner
 	owner := util.FindOwner(reflect.ValueOf(f.root), f.fullname)
 	for owner.Kind() != reflect.Struct {
@@ -61,7 +49,8 @@ func (f *field) setter(v string) {
 	// convert input argument
 	var tmp interface{}
 	if err := json.Unmarshal([]byte(v), &tmp); err != nil {
-		tmp = v
+		log.Warnf("can't unmarshal field[%v]'s argument: %v", f.fullname, v)
+		tmp = v // fallback
 	}
 	// check it's real Set method.
 	m := owner.Addr().MethodByName("Set" + f.name)
@@ -82,7 +71,6 @@ func (f *field) setter(v string) {
 			return
 		}
 	}
-	log.Debugf("set field[%v] done: %v", f.fullname, v)
 	// update cache
 	f.cache = nil
 }

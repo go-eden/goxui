@@ -2,7 +2,7 @@ package goxui
 
 import (
 	"github.com/go-eden/goxui/core"
-	slog "github.com/go-eden/slf4go"
+	"github.com/go-eden/slf4go"
 	"reflect"
 )
 

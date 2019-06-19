@@ -95,6 +95,8 @@ func TriggerEvent(name string, data interface{}) {
 	cData := C.CString(_data)
 	defer C.free(unsafe.Pointer(cName))
 	defer C.free(unsafe.Pointer(cData))
+
+	log.Debugf("TriggerEvent: %v, %v", name, _data)
 	C.ui_trigger_event(cName, cType, cData)
 }
 
@@ -114,6 +116,8 @@ func NotifyField(name string) bool {
 func Start(root string) int {
 	cRoot := C.CString(root)
 	defer C.free(unsafe.Pointer(cRoot))
+
+	log.Debugf("Start: %v", root)
 	cCode := C.ui_start(cRoot)
 	return int(cCode)
 }
