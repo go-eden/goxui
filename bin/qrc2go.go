@@ -17,7 +17,6 @@ var goFile = name + ".go"
 
 var tmpl = "package %s\n\nvar DATA = []byte%s"
 
-// 将指定目录打包为rcc文件
 func main() {
 	if len(os.Args) < 2 {
 		slog.Info("need directory as qrc path.")
