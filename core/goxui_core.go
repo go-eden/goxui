@@ -24,7 +24,9 @@ static inline void bindLogger() {
 }
 */
 import "C"
-import "github.com/go-eden/slf4go"
+import (
+	"github.com/go-eden/slf4go"
+)
 
 var log = slog.GetLogger()
 

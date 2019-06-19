@@ -3,6 +3,7 @@ package goxui
 import (
 	"github.com/go-eden/goxui/core"
 	"github.com/go-eden/slf4go"
+	"os"
 	"reflect"
 )
 
@@ -14,6 +15,11 @@ var log = slog.GetLogger()
 // Initilize ui context, and QApplication.
 func Init() {
 	core.Init()
+}
+
+// Enable single application configuration
+func EnableSingleApplication() {
+	_ = os.Setenv("GOXUI_SINGLE_APPLICATION", "1")
 }
 
 // Add the specified RCC into Qt resources system.

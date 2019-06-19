@@ -10,5 +10,7 @@ func main() {
 
 	goxui.Init()
 
+	goxui.EnableSingleApplication()
+
 	goxui.StartRelative("ui", "singleapp.qml")
 }
