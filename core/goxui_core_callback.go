@@ -5,16 +5,16 @@ package core
 #include <stdio.h>
 #include "goxui.h"
 
-extern char *getField(char *name);
-extern void setField(char *name, char *data);
-extern char *invoke(char *name, char *params);
+extern char *uiGetField(char *name);
+extern void uiSetField(char *name, char *data);
+extern char *uiInvoke(char *name, char *params);
 
 static inline int _ui_add_field(char *name, int type) {
-    return ui_add_field(name, type, getField, setField);
+    return ui_add_field(name, type, uiGetField, uiSetField);
 }
 
 static inline int _ui_add_method(char *name, int retType, int argNum) {
-    return ui_add_method(name, retType, argNum, invoke);
+    return ui_add_method(name, retType, argNum, uiInvoke);
 }
 */
 import "C"
@@ -28,8 +28,8 @@ var (
 	methodCallbackMap = make(map[string]func(string) string)
 )
 
-//export getField
-func getField(cName *C.char) *C.char {
+//export uiGetField
+func uiGetField(cName *C.char) *C.char {
 	name := C.GoString(cName)
 	log.Debugf("get field[%v]", name)
 	defer func() {
@@ -47,8 +47,8 @@ func getField(cName *C.char) *C.char {
 	return nil
 }
 
-//export setField
-func setField(cName *C.char, cVal *C.char) {
+//export uiSetField
+func uiSetField(cName *C.char, cVal *C.char) {
 	name := C.GoString(cName)
 	val := C.GoString(cVal)
 	log.Debugf("set field[%v]: %v", name, val)
@@ -58,7 +58,7 @@ func setField(cName *C.char, cVal *C.char) {
 		}
 	}()
 	if bs, err := base64.StdEncoding.DecodeString(val); err != nil {
-		log.Errorf("setField %v failed, parse data [%v] failed: %v", name, val, err)
+		log.Errorf("set Field %v failed, parse data [%v] failed: %v", name, val, err)
 		return
 	} else {
 		val = string(bs)
@@ -71,8 +71,8 @@ func setField(cName *C.char, cVal *C.char) {
 	}
 }
 
-//export invoke
-func invoke(cName *C.char, cData *C.char) *C.char {
+//export uiInvoke
+func uiInvoke(cName *C.char, cData *C.char) *C.char {
 	name := C.GoString(cName)
 	data := C.GoString(cData)
 	log.Debugf("invoke [%v] with args %v", name, data)

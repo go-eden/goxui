@@ -17,10 +17,10 @@ package core
 #cgo LDFLAGS: -lgoxui
 #include "goxui.h"
 
-extern void logger(int l, char *msg);
+extern void uiLogger(int l, char *msg);
 
-static inline void bindLogger() {
-	ui_set_logger(logger);
+static inline void _ui_bind_logger() {
+	ui_set_logger(uiLogger);
 }
 */
 import "C"
@@ -31,11 +31,11 @@ import (
 var log = slog.GetLogger()
 
 func init() {
-	C.bindLogger()
+	C._ui_bind_logger()
 }
 
-//export logger
-func logger(cLevel C.int, cMsg *C.char) {
+//export uiLogger
+func uiLogger(cLevel C.int, cMsg *C.char) {
 	l := int(cLevel)
 	msg := C.GoString(cMsg)
 	switch l {
