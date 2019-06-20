@@ -12,9 +12,7 @@ static void* allocArgv(int argc) {
 import "C"
 import (
 	"fmt"
-	"github.com/go-eden/goxui/util"
 	"os"
-	"reflect"
 	"unsafe"
 )
 
@@ -87,16 +85,13 @@ func ToolSetDebugEnabled(enable bool) {
 }
 
 // Forward Goxui's ui_trigger_event method, it will trigger the specified event.
-func TriggerEvent(name string, data interface{}) {
-	dtype := ParseQType(reflect.TypeOf(data))
-	_data := util.ToString(data)
+func TriggerEvent(name string, t QType, data string) {
 	cName := C.CString(name)
-	cType := C.int(dtype)
-	cData := C.CString(_data)
+	cType := C.int(t)
+	cData := C.CString(data)
 	defer C.free(unsafe.Pointer(cName))
 	defer C.free(unsafe.Pointer(cData))
 
-	log.Debugf("TriggerEvent: %v, %v", name, _data)
 	C.ui_trigger_event(cName, cType, cData)
 }
 
@@ -117,7 +112,6 @@ func Start(root string) int {
 	cRoot := C.CString(root)
 	defer C.free(unsafe.Pointer(cRoot))
 
-	log.Debugf("Start: %v", root)
 	cCode := C.ui_start(cRoot)
 	return int(cCode)
 }

@@ -2,6 +2,7 @@ package goxui
 
 import (
 	"github.com/go-eden/goxui/core"
+	"github.com/go-eden/goxui/util"
 	"github.com/go-eden/slf4go"
 	"os"
 	"reflect"
@@ -55,12 +56,16 @@ func SetDebugEnabled(enable bool) {
 
 // UI's entry-point, will block until fail or exit.
 func Start(root string) int {
+	log.Debugf("Start: %v", root)
 	return core.Start(root)
 }
 
 // Trigger the named event, with specified data.
 func TriggerEvent(name string, data interface{}) {
-	core.TriggerEvent(name, data)
+	dtype := core.ParseQType(reflect.TypeOf(data))
+	_data := util.ToString(data)
+	log.Debugf("TriggerEvent: %v, %v", name, _data)
+	core.TriggerEvent(name, dtype, _data)
 }
 
 // Flush add fields, notify Qt if value changed.
@@ -90,6 +95,6 @@ func BindObject(obj interface{}) {
 	for i := range methods {
 		methods[i].root = obj
 		core.AddMethod(methods[i].fullname, methods[i].otype, methods[i].inum, methods[i].invoke)
-		log.Debugf("bind method: %v(%v), %v", methods[i].fullname, methods[i].inum, methods[i].otype)
+		log.Debugf("bind method: %v(%v) => %v", methods[i].fullname, methods[i].inum, methods[i].otype)
 	}
 }

@@ -99,7 +99,6 @@ func uiInvoke(cName *C.char, cData *C.char) *C.char {
 
 // Add a golang filed into Goxui's environment, must provide reader and writer callback.
 func AddField(name string, fieldType QType, reader func() string, writer func(string)) bool {
-	log.Infof("AddField: %v, %v", name, fieldType)
 	cName := C.CString(name)
 	cType := C.int(fieldType)
 	cResult := C._ui_add_field(cName, cType)
@@ -115,7 +114,6 @@ func AddField(name string, fieldType QType, reader func() string, writer func(st
 
 // Add a golang method into Goxui's environment
 func AddMethod(name string, retType QType, argNum int, callback func(string) string) bool {
-	log.Infof("AddMethod: %v(%d)=>%v", name, argNum, retType)
 	cName := C.CString(name)
 	cType := C.int(retType)
 	cArgNum := C.int(argNum)

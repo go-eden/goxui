@@ -4,7 +4,6 @@ import (
 	"github.com/go-eden/goxui"
 	"github.com/go-eden/goxui/util"
 	slog "github.com/go-eden/slf4go"
-	"path/filepath"
 	"runtime"
 	"time"
 )
@@ -84,10 +83,10 @@ func (u User) QueryInfo() (string, bool) {
 func main() {
 	runtime.LockOSThread()
 
-	_, filename, _, _ := runtime.Caller(0)
-	path := filepath.Dir(filename)
-
 	goxui.Init()
+
+	goxui.BindObject(new(User))
+
 	go func() {
 		time.Sleep(time.Second * 5)
 		goxui.TriggerEvent("event_bool", true)
@@ -98,5 +97,6 @@ func main() {
 		goxui.TriggerEvent("event_object", Param{"啦啦啦", 3333333})
 		goxui.TriggerEvent("event_array", []Param{{"啦啦啦", 3333333}, {"啦啦啦444", 3333333}})
 	}()
-	goxui.Start(filepath.Join(path, "qml", "fulltest.qml"))
+
+	goxui.StartRelative("ui", "fulltest.qml")
 }
