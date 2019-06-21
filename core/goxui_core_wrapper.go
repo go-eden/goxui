@@ -75,15 +75,6 @@ func ToolSetHttpProxy(host string, port int) {
 	C.ui_tool_set_http_proxy(cHost, C.int(port))
 }
 
-// Forward Goxui's ui_tool_set_debug_enabled method, it will enable some debug features or not.
-func ToolSetDebugEnabled(enable bool) {
-	if enable {
-		C.ui_tool_set_debug_enabled(C.int(1))
-	} else {
-		C.ui_tool_set_debug_enabled(C.int(0))
-	}
-}
-
 // Forward Goxui's ui_trigger_event method, it will trigger the specified event.
 func TriggerEvent(name string, t QType, data string) {
 	cName := C.CString(name)

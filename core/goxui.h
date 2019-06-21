@@ -34,7 +34,7 @@ API void ui_init(int argc, char **argv);
  * setup qt's logger
  * @param logger Outter logger
  */
-API void ui_set_logger(void (*logger)(int, char *));
+API void ui_set_logger(void (*logger)(int type, char *catagory, char* file, int line, char* msg));
 
 /**
  * Add specified object into QML's context, MUST BE QObject
@@ -126,12 +126,6 @@ API int ui_start(char *root);
  * @param port Proxy's port
  */
 API void ui_tool_set_http_proxy(char *host, int port);
-
-/**
- * TOOL: setup whether enable debug level log or not
- * @param enable Whether enable debug log or not
- */  
-API void ui_tool_set_debug_enabled(int enable);
 
 #ifdef __cplusplus
 }

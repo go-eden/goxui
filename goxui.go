@@ -49,11 +49,6 @@ func SetHttpProxy(host string, port int) {
 	core.ToolSetHttpProxy(host, port)
 }
 
-// TOOL: setup whether enable debug level log or not.
-func SetDebugEnabled(enable bool) {
-	core.ToolSetDebugEnabled(enable)
-}
-
 // UI's entry-point, will block until fail or exit.
 func Start(root string) int {
 	log.Debugf("Start: %v", root)

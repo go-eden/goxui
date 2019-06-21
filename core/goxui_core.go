@@ -17,7 +17,7 @@ package core
 #cgo LDFLAGS: -lgoxui
 #include "goxui.h"
 
-extern void uiLogger(int l, char *msg);
+extern void uiLogger(int type, char *catagory, char* file, int line, char* msg);
 
 static inline void _ui_bind_logger() {
 	ui_set_logger(uiLogger);
@@ -35,19 +35,22 @@ func init() {
 }
 
 //export uiLogger
-func uiLogger(cLevel C.int, cMsg *C.char) {
+func uiLogger(cLevel C.int, cCategory *C.char, cFile *C.char, cLine C.int, cMsg *C.char) {
 	l := int(cLevel)
+	category := C.GoString(cCategory)
+	file := C.GoString(cFile)
+	line := int(cLine)
 	msg := C.GoString(cMsg)
 	switch l {
 	case 0:
-		log.Debug(msg)
+		log.Debugf("[%v] %v:%v %v", category, file, line, msg)
 	case 1:
-		log.Warn(msg)
+		log.Warnf("[%v] %v:%v %v", category, file, line, msg)
 	case 2:
-		log.Error(msg)
+		log.Errorf("[%v] %v:%v %v", category, file, line, msg)
 	case 3:
-		log.Fatal(msg)
+		log.Fatalf("[%v] %v:%v %v", category, file, line, msg)
 	case 4:
-		log.Infof(msg)
+		log.Infof("[%v] %v:%v %v", category, file, line, msg)
 	}
 }
