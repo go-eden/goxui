@@ -34,7 +34,7 @@ API void ui_init(int argc, char **argv);
  * setup qt's logger
  * @param logger Outter logger
  */
-API void ui_set_logger(void (*logger)(int type, char *catagory, char* file, int line, char* msg));
+API void ui_set_logger(void (*logger)(int type, char* file, int line, char* msg));
 
 /**
  * Add specified object into QML's context, MUST BE QObject

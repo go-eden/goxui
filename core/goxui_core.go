@@ -17,7 +17,7 @@ package core
 #cgo LDFLAGS: -lgoxui
 #include "goxui.h"
 
-extern void uiLogger(int type, char *catagory, char* file, int line, char* msg);
+extern void uiLogger(int type, char* file, int line, char* msg);
 
 static inline void _ui_bind_logger() {
 	ui_set_logger(uiLogger);
@@ -26,31 +26,61 @@ static inline void _ui_bind_logger() {
 import "C"
 import (
 	"github.com/go-eden/slf4go"
+	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 var log = slog.GetLogger()
+var nativeLog = slog.NewLogger("goxui/core")
+var qmlLog = slog.NewLogger("goxui/qml")
 
 func init() {
 	C._ui_bind_logger()
 }
 
 //export uiLogger
-func uiLogger(cLevel C.int, cCategory *C.char, cFile *C.char, cLine C.int, cMsg *C.char) {
-	l := int(cLevel)
-	category := C.GoString(cCategory)
+func uiLogger(cLevel C.int, cFile *C.char, cLine C.int, cMsg *C.char) {
 	file := C.GoString(cFile)
 	line := int(cLine)
 	msg := C.GoString(cMsg)
-	switch l {
+	// fix message
+	if len(file) > 0 && strings.HasPrefix(msg, file) && len(msg) > len(file)+1 {
+		msg = msg[len(file)+1:]
+		if linePrefix := strconv.Itoa(line) + ":"; strings.HasPrefix(msg, linePrefix) {
+			msg = msg[len(linePrefix):]
+		}
+	}
+	// fix file
+	if len(file) > 0 {
+		file = filepath.Base(file)
+	}
+	// custom stack
+	stack := &slog.Stack{
+		Package:  "goxui-cbridge",
+		Function: "unknown",
+	}
+	// choice logger
+	var log *slog.Logger
+	if file == "" && line == 0 {
+		log = nativeLog
+		stack.Line = 0
+		stack.Filename = "unknown"
+	} else {
+		log = qmlLog
+		stack.Line = line
+		stack.Filename = file
+	}
+	switch int(cLevel) {
 	case 0:
-		log.Debugf("[%v] %v:%v %v", category, file, line, msg)
+		log.Debug(stack, msg)
 	case 1:
-		log.Warnf("[%v] %v:%v %v", category, file, line, msg)
+		log.Warn(stack, msg)
 	case 2:
-		log.Errorf("[%v] %v:%v %v", category, file, line, msg)
+		log.Error(stack, msg)
 	case 3:
-		log.Fatalf("[%v] %v:%v %v", category, file, line, msg)
+		log.Error(stack, msg)
 	case 4:
-		log.Infof("[%v] %v:%v %v", category, file, line, msg)
+		log.Info(stack, msg)
 	}
 }
