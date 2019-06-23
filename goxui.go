@@ -59,7 +59,7 @@ func Start(root string) int {
 func TriggerEvent(name string, data interface{}) {
 	dtype := core.ParseQType(reflect.TypeOf(data))
 	_data := util.ToString(data)
-	log.Debugf("TriggerEvent: %v, %v", name, _data)
+	log.Debugf("TriggerEvent: %v[%v], %v", name, dtype, _data)
 	core.TriggerEvent(name, dtype, _data)
 }
 

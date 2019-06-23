@@ -5,14 +5,14 @@ import "reflect"
 type QType int
 
 const (
-	QUnknownType       = -1
-	QVoidType    QType = iota
-	QBoolType
-	QIntType
-	QLongType
-	QDoubleType
-	QObjectType
-	QStringType
+	QUnknownType QType = -1
+	QVoidType    QType = 0
+	QBoolType    QType = 1
+	QIntType     QType = 2
+	QLongType    QType = 3
+	QDoubleType  QType = 4
+	QObjectType  QType = 5
+	QStringType  QType = 6
 )
 
 func (t QType) String() string {
