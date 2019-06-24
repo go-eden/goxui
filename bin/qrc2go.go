@@ -31,9 +31,13 @@ func main() {
 		dir += string(os.PathSeparator)
 	}
 
-	qrcFile = dir + qrcFile
-	rccFile = dir + rccFile
-	goFile = dir + goFile
+	qrcFile = filepath.Join(dir, qrcFile)
+	rccFile = filepath.Join(dir, rccFile)
+	goFile = filepath.Join(dir, goFile)
+
+	_ = os.Remove(qrcFile)
+	_ = os.Remove(rccFile)
+	_ = os.Remove(goFile)
 
 	slog.Info("generate qrc for: ", dir)
 	generateRcc(dir)
